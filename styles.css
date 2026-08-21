@@ -394,3 +394,36 @@ body.dark .quran-passage .passage-surah-title{background:var(--primary);border-c
 .selector-title-card{overflow:visible}.selector-title-card #khatmaSelector{height:60px;min-height:60px;padding-block:9px;line-height:1.5;font-size:20px;overflow:visible}
 #khatmaSummaryName{display:block;width:100%;max-width:100%;padding:3px 8px;line-height:1.55;white-space:normal;overflow:visible;text-align:center}
 body.reading-mode .bottom-nav{display:none}body.reading-mode .app-shell{padding-bottom:0}#readingScreen{padding-bottom:calc(10px + var(--safe-bottom))}#readingScreen .mushaf-card{min-height:0;height:auto;margin-bottom:12px}#readingScreen #quranText{margin-bottom:0;padding-bottom:0}#readingScreen .reading-progress{margin-top:12px}#readingScreen #finishQuarterBtn{margin-bottom:0}
+
+/* Stable cross-language field alignment */
+.options-modal>label,.options-modal .two-fields label,.kahf-notification-setting .kahf-time-label,.prayer-field label{width:100%;text-align:center!important;margin-inline:auto}
+.options-modal>input,.kahf-notification-setting>input[type="time"]{display:block;width:100%!important;margin-inline:auto!important}
+input[type="time"]{direction:ltr!important;text-align:center!important;text-align-last:center!important;padding-inline:14px!important}
+input[type="time"]::-webkit-date-and-time-value{text-align:center!important;width:100%;min-width:100%;margin:0 auto}
+input[type="time"]::-webkit-datetime-edit{display:block;text-align:center;width:100%;padding:0}
+.options-modal .two-fields>div{text-align:center}.options-modal .two-fields input{text-align:center!important}
+.calculation-locked [aria-disabled="true"],.calculation-locked input[readonly]{opacity:.62;cursor:not-allowed}
+
+/* A fixed visual order in both RTL and LTR interfaces. */
+.bottom-nav{direction:rtl;border:1.5px solid var(--primary-strong)}
+body.dark .bottom-nav{border-color:#d9c8b8}
+body:not(.dark) .bottom-nav{border-color:#5a3e43}
+.bottom-nav .nav-item{direction:inherit}
+
+/* Stable Khatma overview: the document owns scrolling, so the layout never snaps. */
+#khatmaScreen{height:auto;min-height:0;overflow:visible;display:none;scroll-behavior:auto;overscroll-behavior:auto}
+#khatmaScreen.active{display:block}
+.khatma-summary{position:static;cursor:default;padding:22px}
+.khatma-date-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+.khatma-date-row p{margin:0;padding:10px;border-radius:14px;background:var(--surface-2);display:flex;flex-direction:column;gap:5px;text-align:center}
+.khatma-date-row span{font-size:12px;color:var(--muted)}.khatma-date-row strong{font-size:14px}
+.khatma-stage-line,.khatma-completion-date{margin:12px 0 0;text-align:center;font-size:13px;line-height:1.5}
+.khatma-start-card{display:block;width:100%;margin:12px 0;padding:18px;text-align:center;font-size:17px;font-weight:900;color:var(--text)}
+.khatma-start-card:active{transform:scale(.99)}
+.khatma-summary:hover{transform:none}.khatma-compact .khatma-summary{display:block;padding:22px;text-align:center}.khatma-compact .khatma-stats{max-height:none;opacity:1;overflow:visible;margin:initial;padding:initial}
+
+/* Day navigation has one meaning regardless of language direction. */
+.wird-day-nav{direction:ltr}.wird-day-nav button{font-size:27px;font-weight:800;line-height:1;text-align:center}.wird-day-nav strong{direction:initial}
+
+/* Prayer times are the primary content; settings follow them. */
+#groupScreen .prayer-times{margin:0 0 14px}.prayer-location-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.prayer-field input{text-align:center!important;text-align-last:center!important;border-radius:16px}

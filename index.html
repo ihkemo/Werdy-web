@@ -10,7 +10,7 @@
   <title>وِردي | Werdy</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
-  <link rel="stylesheet" href="styles.css?v=34" />
+  <link rel="stylesheet" href="styles.css?v=35" />
 </head>
 <body>
   
@@ -63,11 +63,11 @@
     <section class="screen" id="wirdDetailsScreen">
       <div class="section-title-row"><button class="back-btn" data-target="homeScreen">→</button><h1>تفاصيل الوِرد</h1><span></span></div>
       <article class="hero-card detail-hero"><span class="khatma-tag" id="detailKhatmaName">الختمة الأساسية</span><h2 id="detailRange">من الفاتحة 1 إلى البقرة 25</h2><p id="detailPreview">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ...</p></article>
-      <div class="wird-day-nav"><button id="previousWirdBtn">→</button><strong id="wirdDayLabel">وِرد اليوم الأول</strong><button id="nextWirdBtn">←</button></div>
+      <div class="wird-day-nav"><button id="previousWirdBtn" aria-label="اليوم السابق">−</button><strong id="wirdDayLabel">وِرد اليوم الأول</strong><button id="nextWirdBtn" aria-label="اليوم التالي">+</button></div>
       <div class="detail-chart"><div class="chart-center"><strong id="detailPercent">0%</strong><small>تم اليوم</small></div></div>
       <div class="stats-grid detail-stats"><article class="stat"><span>تمت قراءته</span><strong id="doneCount">0</strong><small>ربع</small></article><article class="stat"><span>المتبقي</span><strong id="remainingCount">2</strong><small>ربع</small></article><article class="stat"><span>إجمالي الوِرد</span><strong id="detailTotal">2</strong><small>ربع</small></article><article class="stat schedule-stat"><span>مقارنة بالخطة</span><strong id="scheduleDelta">في الموعد</strong><small id="scheduleDeltaDetail">لا تأخير</small></article></div>
       <button class="primary-btn" id="startReadingBtn">ابدأ الوِرد</button>
-      <button class="secondary-btn" id="editKhatmaBtn">تعديل إعدادات الختمة</button>
+      <button class="secondary-btn" id="completeWirdDayBtn">تمت قراءة وِرد اليوم</button>
     </section>
 
     <div class="modal-backdrop hidden" id="reminderModal"><div class="mini-modal"><h2>موعد تذكير الوِرد</h2><input type="time" id="quickReminderTime" /><div class="modal-actions"><button class="text-btn" id="cancelReminderBtn">إلغاء</button><button class="primary-btn" id="saveReminderBtn">حفظ</button></div></div></div>
@@ -117,18 +117,18 @@
 
     <section class="screen active" id="khatmaScreen">
       <div class="page-title-card selector-title-card"><select id="khatmaSelector" aria-label="اختر الختمة"></select></div>
-      <article class="hero-card khatma-summary" role="button" tabindex="0" aria-label="ابدأ وِرد الختمة الحالية">
+      <article class="hero-card khatma-summary">
         <div class="ring" id="khatmaRing"><strong id="khatmaPercent">0%</strong></div>
-        <h2 id="khatmaSummaryName">الختمة الأساسية</h2>
-        <p class="muted" id="khatmaEstimate">ابدأ وِردك لاحتساب موعد الختمة</p>
-        <span class="khatma-start-hint">ابدأ الوِرد</span>
+        <div class="khatma-date-row"><p><span id="khatmaStartDateLabel">تاريخ البدء</span><strong id="khatmaStartDate"></strong></p><p><span id="khatmaExpectedDateLabel">الانتهاء المتوقع</span><strong id="khatmaExpectedDate"></strong></p></div>
+        <p class="muted khatma-completion-date hidden" id="khatmaCompletionDate"></p>
+        <p class="muted khatma-stage-line" id="khatmaStageLine"></p>
       </article>
+      <button class="simple-card khatma-start-card" id="khatmaStartCard">ابدأ وِرد اليوم</button>
       <div class="stats-grid khatma-stats">
         <article class="stat"><span>عدد أجزاء الوِرد</span><strong id="totalCompleted">1</strong><small>جزء</small></article>
         <article class="stat"><span>عدد أرباع الوِرد</span><strong id="dailyAmountSummary">0</strong><small>ربع</small></article>
         <article class="stat"><span>أيام القراءة</span><strong id="activeDaysCount">7</strong><small>أسبوعيًا</small></article>
       </div>
-      <article class="simple-card khatma-position-card"><div><span class="muted">المرحلة الحالية</span><strong id="khatmaPosition">الربع الأول من الجزء الأول</strong></div><span>◉</span></article>
       <article class="timeline-card">
         <div class="timeline-head"><strong>سجل الأوراد اليومية</strong><span class="muted">المقروء والقادم</span></div>
         <div class="wird-timeline" id="wirdTimeline"></div>
@@ -137,13 +137,13 @@
 
     <section class="screen" id="groupScreen">
       <div class="page-title-card prayer-title-card"><h1>مواقيت الصلاة</h1><p class="muted" id="prayerDateLabel"></p></div>
+      <div class="prayer-times" id="prayerTimes"><p class="muted center">جاري تحميل مواقيت الصلاة…</p></div>
       <article class="hero-card prayer-settings">
         <div class="prayer-field"><label for="prayerMethod">جهة حساب المواقيت</label><select id="prayerMethod"><option value="4">جامعة أم القرى — مكة</option><option value="3">Muslim World League (MWL) — رابطة العالم الإسلامي</option><option value="5">الهيئة المصرية العامة للمساحة</option><option value="2">الجمعية الإسلامية لأمريكا الشمالية</option><option value="1">جامعة العلوم الإسلامية — كراتشي</option><option value="13">رئاسة الشؤون الدينية التركية</option></select></div>
         <div class="prayer-location-grid"><div class="prayer-field"><label for="prayerCity">المدينة</label><input id="prayerCity" value="Belfast" readonly/></div><div class="prayer-field"><label for="prayerCountry">الدولة</label><input id="prayerCountry" value="GB" readonly/></div></div>
         <button class="small-btn location-btn" id="useCurrentLocationBtn">⌖ استخدم موقعي الحالي</button>
         <small class="location-status muted" id="prayerLocationStatus">الموقع الحالي: Belfast، GB</small><small class="source-note">تتحدث المواقيت تلقائيًا، وقد تختلف عن توقيت مسجدك المحلي.</small>
       </article>
-      <div class="prayer-times" id="prayerTimes"><p class="muted center">جاري تحميل مواقيت الصلاة…</p></div>
     </section>
 
     <section class="screen" id="settingsScreen">
@@ -222,16 +222,16 @@
     </section>
 
     <nav class="bottom-nav">
+      <button class="nav-item" data-target="settingsScreen" aria-label="الإعدادات"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10M14 4v6M7 14v6"/><circle cx="14" cy="7" r="2"/><circle cx="7" cy="17" r="2"/></svg><span>الإعدادات</span></button>
+      <button class="nav-item" data-target="groupScreen" aria-label="الصلاة"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v4.5l3 1.8M18.5 4.5l1 1"/></svg><span>الصلاة</span></button>
+      <button class="nav-item active" data-target="khatmaScreen" aria-label="الرئيسية"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="m8.5 12 2.2 2.2 4.8-5"/></svg><span>الرئيسية</span></button>
       <button class="nav-item" data-target="homeScreen" aria-label="الأوراد"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5M5.5 10v9h13v-9M9.5 19v-5h5v5"/></svg><span>الأوراد</span></button>
       <button class="nav-item" data-target="mushafScreen" aria-label="المصحف"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5c3.4-.8 6-.2 8 1.5v12c-2-1.7-4.6-2.3-8-1.5v-12Zm16 0c-3.4-.8-6-.2-8 1.5v12c2-1.7 4.6-2.3 8-1.5v-12Z"/></svg><span>المصحف</span></button>
-      <button class="nav-item active" data-target="khatmaScreen" aria-label="الرئيسية"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="m8.5 12 2.2 2.2 4.8-5"/></svg><span>الرئيسية</span></button>
-      <button class="nav-item" data-target="groupScreen" aria-label="الصلاة"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v4.5l3 1.8M18.5 4.5l1 1"/></svg><span>الصلاة</span></button>
-      <button class="nav-item" data-target="settingsScreen" aria-label="الإعدادات"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10M14 4v6M7 14v6"/><circle cx="14" cy="7" r="2"/><circle cx="7" cy="17" r="2"/></svg><span>الإعدادات</span></button>
     </nav>
   </main>
 
   <script src="assets/quran/quran-data.js"></script>
-  <script type="module">if(location.protocol!=="file:")import("./native-notifications.js");</script>
-  <script src="app.js?v=36"></script>
+  <script type="module">if(window.Capacitor?.isNativePlatform?.())import("./native-notifications.js");</script>
+  <script src="app.js?v=37"></script>
 </body>
 </html>
