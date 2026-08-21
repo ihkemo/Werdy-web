@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#6f8561" />
+  <title>وِردي | Werdy</title>
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="apple-touch-icon" href="./assets/icon-192-eh9l39s9.png" />
+  <script type="module" crossorigin src="./assets/index-DP4KjaLs.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-Q3AbbH9v.css">
+</head>
+<body>
+  
+  <section class="onboarding-overlay" id="onboarding">
+    <div class="onboarding-card">
+      <div class="brand large"><span class="brand-ar">وِردي</span><span class="brand-en">Werdy</span></div>
+      <h1 id="onboardingTitle">اختر اللغة والمظهر</h1>
+      <p class="muted" id="onboardingSubtitle">يمكنك تغيير هذه الإعدادات لاحقًا.</p>
+
+      <div class="onboarding-section">
+        <label id="languageLabel">اللغة</label>
+        <div class="choice-row">
+          <button class="choice-btn active" data-lang-choice="ar">العربية</button>
+          <button class="choice-btn" data-lang-choice="en">English</button>
+        </div>
+      </div>
+
+      <div class="onboarding-section">
+        <label id="themeLabel">المظهر</label>
+        <div class="choice-row">
+          <button class="choice-btn active" data-theme-choice="system" id="systemThemeBtn">حسب الجهاز</button>
+          <button class="choice-btn" data-theme-choice="light" id="lightThemeBtn">فاتح</button>
+          <button class="choice-btn" data-theme-choice="dark" id="darkThemeBtn">داكن</button>
+        </div>
+      </div>
+
+      <div class="onboarding-section"><label id="onboardingLocationLabel">الموقع لمواقيت الصلاة</label><button class="choice-btn location-onboarding-btn" id="onboardingLocationBtn">تحديد موقعي الحالي</button><small class="muted onboarding-location-status" id="onboardingLocationStatus">يمكنك تغييره لاحقًا من شاشة الصلاة.</small></div>
+
+      <button class="primary-btn" id="continueOnboarding">متابعة</button>
+    </div>
+  </section>
+
+  <main class="app-shell">
+    <header class="topbar">
+      <button class="icon-btn" id="menuBtn" aria-label="البحث في المصحف">⌕</button>
+      <div class="brand"><span class="brand-ar">وِردي</span><span class="brand-en">Werdy</span></div>
+      <button class="icon-btn theme-toggle-btn" id="settingsBtn" aria-label="تغيير المظهر"></button>
+    </header>
+    <div class="global-quran-search hidden" id="globalQuranSearch">
+      <select id="globalSurahSelect" aria-label="السورة"></select>
+      <input id="globalAyahInput" type="number" min="1" value="1" aria-label="رقم الآية" />
+      <button class="small-btn" id="globalQuranGoBtn">انتقال</button>
+    </div>
+
+    <section class="screen" id="homeScreen">
+      <div class="page-title-card"><h1>الأوراد</h1><p class="muted" id="todayLabel"></p><span class="count-badge hidden" id="awradCount">1</span></div>
+      <div id="awradCards" class="awrad-cards"></div>
+    </section>
+
+    <section class="screen" id="wirdDetailsScreen">
+      <div class="section-title-row"><button class="back-btn" data-target="homeScreen">→</button><h1>تفاصيل الوِرد</h1><span></span></div>
+      <article class="hero-card detail-hero"><span class="khatma-tag" id="detailKhatmaName">الختمة الأساسية</span><h2 id="detailRange">من الفاتحة 1 إلى البقرة 25</h2><p id="detailPreview">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ...</p></article>
+      <div class="wird-day-nav"><button id="previousWirdBtn">→</button><strong id="wirdDayLabel">وِرد اليوم الأول</strong><button id="nextWirdBtn">←</button></div>
+      <div class="detail-chart"><div class="chart-center"><strong id="detailPercent">0%</strong><small>تم اليوم</small></div></div>
+      <div class="stats-grid detail-stats"><article class="stat"><span>تمت قراءته</span><strong id="doneCount">0</strong><small>ربع</small></article><article class="stat"><span>المتبقي</span><strong id="remainingCount">2</strong><small>ربع</small></article><article class="stat"><span>إجمالي الوِرد</span><strong id="detailTotal">2</strong><small>ربع</small></article><article class="stat schedule-stat"><span>مقارنة بالخطة</span><strong id="scheduleDelta">في الموعد</strong><small id="scheduleDeltaDetail">لا تأخير</small></article></div>
+      <button class="primary-btn" id="startReadingBtn">ابدأ الوِرد</button>
+      <button class="secondary-btn" id="editKhatmaBtn">تعديل إعدادات الختمة</button>
+    </section>
+
+    <div class="modal-backdrop hidden" id="reminderModal"><div class="mini-modal"><h2>موعد تذكير الوِرد</h2><input type="time" id="quickReminderTime" /><div class="modal-actions"><button class="text-btn" id="cancelReminderBtn">إلغاء</button><button class="primary-btn" id="saveReminderBtn">حفظ</button></div></div></div>
+    <div class="modal-backdrop hidden" id="khatmaOptionsModal"><div class="mini-modal options-modal"><h2 id="khatmaOptionsTitle">إعدادات الختمة</h2><label id="khatmaEditableNameLabel">اسم الختمة</label><input type="text" id="khatmaEditableName" maxlength="60"/><label>وقت التذكير اليومي</label><input type="time" id="khatmaReminderTime"/><small class="time-preview" id="khatmaReminderPreview"></small><label>أيام الوِرد</label><div class="days-grid" id="khatmaDaysGrid"></div><label>مقدار الوِرد اليومي</label><div class="two-fields"><div><label>الأجزاء</label><input type="number" id="khatmaParts" min="0" max="30"/></div><div><label>الأرباع</label><input type="number" id="khatmaQuarters" min="0" max="8"/></div></div><small class="validation-message" id="khatmaAmountError"></small><div class="modal-actions"><button class="text-btn" id="cancelKhatmaOptionsBtn">إلغاء</button><button class="primary-btn" id="saveKhatmaOptionsBtn">حفظ</button></div></div></div>
+    <div class="modal-backdrop hidden" id="appDialog" role="dialog" aria-modal="true" aria-labelledby="appDialogTitle" aria-describedby="appDialogMessage"><div class="mini-modal app-dialog-card"><div class="app-dialog-icon" id="appDialogIcon">!</div><h2 id="appDialogTitle"></h2><p id="appDialogMessage"></p><div class="modal-actions app-dialog-actions"><button class="text-btn" id="appDialogCancel"></button><button class="primary-btn" id="appDialogConfirm"></button></div></div></div>
+
+    <section class="screen" id="readingScreen">
+      <div class="section-title-row">
+        <button class="back-btn" data-target="homeScreen">→</button>
+        <h1>قراءة الوِرد</h1>
+        <span></span>
+      </div>
+
+      <div class="reading-meta" id="readingMeta">من سورة البقرة · آية 142 إلى آية 176</div>
+
+      <article class="mushaf-card">
+        <div class="bismillah quran-content" id="readingBismillah">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</div>
+        <div id="quranText" class="quran-content quran-passage">
+          سَيَقُولُ السُّفَهَاءُ مِنَ النَّاسِ مَا وَلَّاهُمْ عَن قِبْلَتِهِمُ الَّتِي كَانُوا عَلَيْهَا ۚ
+          قُل لِّلَّهِ الْمَشْرِقُ وَالْمَغْرِبُ يَهْدِي مَن يَشَاءُ إِلَىٰ صِرَاطٍ مُّسْتَقِيمٍ
+          <span class="ayah-num">١٤٢</span>
+        </div>
+        <p class="quran-content hidden" id="quranText2">
+          وَكَذَٰلِكَ جَعَلْنَاكُمْ أُمَّةً وَسَطًا لِّتَكُونُوا شُهَدَاءَ عَلَى النَّاسِ
+          وَيَكُونَ الرَّسُولُ عَلَيْكُمْ شَهِيدًا...
+        </p>
+      </article>
+
+      <div class="reading-progress">
+        <div class="progress-top">
+          <span>تقدم وِرد اليوم</span>
+          <strong id="readingProgressText">0 من 2 ربع</strong>
+        </div>
+        <div class="progress-track"><div class="progress-bar" id="readingProgressBar"></div></div>
+      </div>
+
+      <button class="primary-btn" id="finishQuarterBtn">تم إتمام الربع</button>
+    </section>
+
+    <section class="screen mushaf-screen" id="mushafScreen">
+      <article class="mushaf-card free-mushaf" id="freeMushafCard">
+        <div class="mushaf-surah-title" id="freeSurahTitle">سورة الفاتحة</div>
+        <div class="bismillah quran-content" id="freeBismillah">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</div>
+        <div id="freeQuranText" class="quran-content quran-passage"></div>
+      </article>
+    </section>
+
+    <section class="screen active" id="khatmaScreen">
+      <div class="page-title-card selector-title-card"><select id="khatmaSelector" aria-label="اختر الختمة"></select></div>
+      <article class="hero-card khatma-summary" role="button" tabindex="0" aria-label="ابدأ وِرد الختمة الحالية">
+        <div class="ring" id="khatmaRing"><strong id="khatmaPercent">0%</strong></div>
+        <h2 id="khatmaSummaryName">الختمة الأساسية</h2>
+        <p class="muted" id="khatmaEstimate">ابدأ وِردك لاحتساب موعد الختمة</p>
+        <span class="khatma-start-hint">ابدأ الوِرد</span>
+      </article>
+      <div class="stats-grid khatma-stats">
+        <article class="stat"><span>الأرباع المكتملة</span><strong id="totalCompleted">0</strong><small>من 240</small></article>
+        <article class="stat"><span>المقدار اليومي</span><strong id="dailyAmountSummary">2</strong><small>ربع</small></article>
+        <article class="stat"><span>أيام القراءة</span><strong id="activeDaysCount">7</strong><small>أسبوعيًا</small></article>
+      </div>
+      <article class="simple-card khatma-position-card"><div><span class="muted">المرحلة الحالية</span><strong id="khatmaPosition">الربع 1 من 240</strong></div><span>◉</span></article>
+      <article class="timeline-card">
+        <div class="timeline-head"><strong>سجل الأوراد اليومية</strong><span class="muted">المقروء والقادم</span></div>
+        <div class="wird-timeline" id="wirdTimeline"></div>
+      </article>
+    </section>
+
+    <section class="screen" id="groupScreen">
+      <div class="page-title-card prayer-title-card"><h1>مواقيت الصلاة</h1><p class="muted" id="prayerDateLabel"></p></div>
+      <article class="hero-card prayer-settings">
+        <div class="prayer-field"><label for="prayerMethod">جهة حساب المواقيت</label><select id="prayerMethod"><option value="4">جامعة أم القرى — مكة</option><option value="3">Muslim World League (MWL) — رابطة العالم الإسلامي</option><option value="5">الهيئة المصرية العامة للمساحة</option><option value="2">الجمعية الإسلامية لأمريكا الشمالية</option><option value="1">جامعة العلوم الإسلامية — كراتشي</option><option value="13">رئاسة الشؤون الدينية التركية</option></select></div>
+        <div class="prayer-location-grid"><div class="prayer-field"><label for="prayerCity">المدينة</label><input id="prayerCity" value="Belfast" readonly/></div><div class="prayer-field"><label for="prayerCountry">الدولة</label><input id="prayerCountry" value="GB" readonly/></div></div>
+        <button class="small-btn location-btn" id="useCurrentLocationBtn">⌖ استخدم موقعي الحالي</button>
+        <small class="location-status muted" id="prayerLocationStatus">الموقع الحالي: Belfast، GB</small><small class="source-note">تتحدث المواقيت تلقائيًا، وقد تختلف عن توقيت مسجدك المحلي.</small>
+      </article>
+      <div class="prayer-times" id="prayerTimes"><p class="muted center">جاري تحميل مواقيت الصلاة…</p></div>
+    </section>
+
+    <section class="screen" id="settingsScreen">
+      <div class="page-title-card"><h1>الإعدادات</h1></div>
+
+      <div class="settings-group"><label>الختمات والأوراد</label><div class="inline-add"><input id="khatmaNameInput" maxlength="40" placeholder="اسم الختمة الجديدة"/><button class="small-btn" id="addKhatmaBtn">إضافة</button></div><div id="settingsKhatmasList" class="settings-khatmas"></div></div>
+
+      <div class="settings-group">
+        <label>حجم خط القرآن</label>
+        <input type="range" id="fontSizeRange" min="20" max="38" step="2" value="26" />
+        <div class="range-caption"><span>أصغر</span><strong id="fontSizeValue">26</strong><span>أكبر</span></div>
+      </div>
+
+      <div class="settings-group notification-setting">
+        <div><label>تنبيهات الوِرد</label><small class="muted" id="notificationStatus">لم يتم تفعيلها</small></div>
+        <button class="small-btn" id="enableNotificationsBtn">تفعيل</button>
+      </div>
+
+      <div class="settings-group kahf-notification-setting">
+        <div class="notification-setting">
+          <div><label id="kahfNotificationLabel">تنبيه بقراءة سورة الكهف يوم الجمعة</label><small class="muted" id="kahfNotificationStatus">مفعّلة</small></div>
+          <button class="small-btn active" id="enableKahfNotificationBtn">إيقاف</button>
+        </div>
+        <label class="kahf-time-label" for="kahfNotificationTime" id="kahfTimeLabel">وقت التنبيه</label>
+        <input type="time" id="kahfNotificationTime" value="09:00" />
+        <small class="time-preview" id="kahfTimePreview"></small>
+      </div>
+
+      <div class="settings-group"><label>نظام عرض الوقت</label><select id="timeFormatSelect"><option value="12">12 ساعة — AM / PM</option><option value="24">24 ساعة</option></select><small class="muted setting-hint">يُطبّق على كل الأوقات المعروضة في البرنامج.</small></div>
+
+      
+      <div class="settings-group">
+        <label id="settingsLanguageLabel">لغة عرض التطبيق</label>
+        <select id="languageSelect">
+          <option value="ar">العربية</option>
+          <option value="en">English</option>
+        </select>
+      </div>
+
+      <div class="settings-group">
+        <label id="quranLanguageLabel">لغة عرض القرآن</label>
+        <select id="quranLanguageSelect">
+          <option value="ar">العربية</option>
+          <option value="en">English</option>
+        </select>
+        <small class="muted setting-hint" id="quranLanguageHint">اختيار مستقل عن لغة عرض التطبيق.</small>
+      </div>
+
+      <div class="settings-group">
+        <label>المظهر</label>
+        <div class="segmented">
+          <button class="seg active" data-theme="system">حسب الجهاز</button>
+          <button class="seg" data-theme="light">فاتح</button>
+          <button class="seg" data-theme="dark">داكن</button>
+        </div>
+      </div>
+
+      <button class="primary-btn" id="saveSettingsBtn">حفظ الإعدادات</button>
+
+      <article class="donation-card">
+        <p class="donation-greeting" id="donationGreeting">عملاؤنا الكرام، تحية طيبة وبعد.</p>
+        <p class="donation-copy" id="donationCopy">بناءً على سياسة مؤسسي التطبيق، فالتطبيق مجاني تمامًا. ويمكنكم هنا التبرع اختياريًا فقط، دعمًا لاستمرار البرنامج وإنشاء برامج أخرى مماثلة.</p>
+        <div class="donation-options" aria-label="خيارات التبرع">
+          <button type="button" aria-disabled="true">£5</button>
+          <button type="button" aria-disabled="true">£10</button>
+          <button type="button" aria-disabled="true">£15</button>
+          <button type="button" aria-disabled="true" id="donationOther">مبلغ آخر</button>
+        </div>
+      </article>
+
+      <article class="donation-card quran-sources-card">
+        <p class="donation-greeting" id="quranSourcesTitle">المصادر والتراخيص</p>
+        <p class="donation-copy" id="quranSourcesCopy">النص العربي العثماني الكامل دون تعديل من مشروع Tanzil، الإصدار 1.1، بترخيص Creative Commons Attribution 3.0. ترجمة المعاني الإنجليزية من ClearQuran بترجمة Talal Itani، وتُعرض دون تعديل بموجب ترخيص Creative Commons Attribution-NonCommercial-NoDerivs.</p>
+        <div class="source-links"><a href="https://tanzil.net/" target="_blank" rel="noopener">Tanzil</a><a href="https://clearquran.com/" target="_blank" rel="noopener">ClearQuran</a></div>
+      </article>
+    </section>
+
+    <nav class="bottom-nav">
+      <button class="nav-item" data-target="homeScreen" aria-label="الأوراد"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5M5.5 10v9h13v-9M9.5 19v-5h5v5"/></svg><span>الأوراد</span></button>
+      <button class="nav-item" data-target="mushafScreen" aria-label="المصحف"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5c3.4-.8 6-.2 8 1.5v12c-2-1.7-4.6-2.3-8-1.5v-12Zm16 0c-3.4-.8-6-.2-8 1.5v12c2-1.7 4.6-2.3 8-1.5v-12Z"/></svg><span>المصحف</span></button>
+      <button class="nav-item active" data-target="khatmaScreen" aria-label="الختمات"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="m8.5 12 2.2 2.2 4.8-5"/></svg><span>الختمات</span></button>
+      <button class="nav-item" data-target="groupScreen" aria-label="الصلاة"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v4.5l3 1.8M18.5 4.5l1 1"/></svg><span>الصلاة</span></button>
+      <button class="nav-item" data-target="settingsScreen" aria-label="الإعدادات"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10M14 4v6M7 14v6"/><circle cx="14" cy="7" r="2"/><circle cx="7" cy="17" r="2"/></svg><span>الإعدادات</span></button>
+    </nav>
+  </main>
+
+  <script src="assets/quran/quran-data.js"></script>
+  <script src="app.js?v=31"></script>
+</body>
+</html>
