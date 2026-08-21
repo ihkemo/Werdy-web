@@ -53,7 +53,7 @@
     </header>
     <div class="global-quran-search hidden" id="globalQuranSearch">
       <select id="globalSurahSelect" aria-label="السورة"></select>
-      <input id="globalAyahInput" type="number" min="1" value="1" aria-label="رقم الآية" />
+      <input id="globalAyahInput" type="text" inputmode="numeric" pattern="[0-9٠-٩۰-۹]*" value="1" aria-label="رقم الآية" />
       <button class="small-btn" id="globalQuranGoBtn">انتقال</button>
     </div>
 
@@ -73,7 +73,7 @@
     </section>
 
     <div class="modal-backdrop hidden" id="reminderModal"><div class="mini-modal"><h2>موعد تذكير الوِرد</h2><input type="time" id="quickReminderTime" /><div class="modal-actions"><button class="text-btn" id="cancelReminderBtn">إلغاء</button><button class="primary-btn" id="saveReminderBtn">حفظ</button></div></div></div>
-    <div class="modal-backdrop hidden" id="khatmaOptionsModal"><div class="mini-modal options-modal"><h2 id="khatmaOptionsTitle">إعدادات الختمة</h2><label id="khatmaEditableNameLabel">اسم الختمة</label><input type="text" id="khatmaEditableName" maxlength="60"/><label>وقت التذكير اليومي</label><input type="time" id="khatmaReminderTime"/><small class="time-preview" id="khatmaReminderPreview"></small><label>أيام الوِرد</label><div class="days-grid" id="khatmaDaysGrid"></div><label>مقدار الوِرد اليومي</label><div class="two-fields"><div><label>الأجزاء</label><input type="number" id="khatmaParts" min="0" max="30"/></div><div><label>الأرباع</label><input type="number" id="khatmaQuarters" min="0" max="8"/></div></div><small class="validation-message" id="khatmaAmountError"></small><div class="modal-actions"><button class="text-btn" id="cancelKhatmaOptionsBtn">إلغاء</button><button class="primary-btn" id="saveKhatmaOptionsBtn">حفظ</button></div></div></div>
+    <div class="modal-backdrop hidden" id="khatmaOptionsModal"><div class="mini-modal options-modal"><h2 id="khatmaOptionsTitle">إعدادات الختمة</h2><label id="khatmaEditableNameLabel">اسم الختمة</label><input type="text" id="khatmaEditableName" maxlength="60"/><label>وقت التذكير اليومي</label><input type="time" id="khatmaReminderTime"/><small class="time-preview" id="khatmaReminderPreview"></small><label>أيام الوِرد</label><div class="days-grid" id="khatmaDaysGrid"></div><label>مقدار الوِرد اليومي</label><div class="two-fields"><div><label>الأجزاء</label><input type="text" inputmode="numeric" pattern="[0-9٠-٩۰-۹]*" id="khatmaParts"/></div><div><label>الأرباع</label><input type="text" inputmode="numeric" pattern="[0-9٠-٩۰-۹]*" id="khatmaQuarters"/></div></div><small class="validation-message" id="khatmaAmountError"></small><div class="modal-actions"><button class="text-btn" id="cancelKhatmaOptionsBtn">إلغاء</button><button class="primary-btn" id="saveKhatmaOptionsBtn">حفظ</button></div></div></div>
     <div class="modal-backdrop hidden" id="appDialog" role="dialog" aria-modal="true" aria-labelledby="appDialogTitle" aria-describedby="appDialogMessage"><div class="mini-modal app-dialog-card"><div class="app-dialog-icon" id="appDialogIcon">!</div><h2 id="appDialogTitle"></h2><p id="appDialogMessage"></p><div class="modal-actions app-dialog-actions"><button class="text-btn" id="appDialogCancel"></button><button class="primary-btn" id="appDialogConfirm"></button></div></div></div>
 
     <section class="screen" id="readingScreen">
