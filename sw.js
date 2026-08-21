@@ -1,5 +1,5 @@
 
-const CACHE='werdy-web-v1';
+const CACHE='werdy-web-v2';
 const appAsset=path=>new URL(path,self.registration.scope).href;
 const CORE=['./','./index.html','./app.js','./manifest.json','./assets/quran/quran-data.js','./icons/icon-192.png','./icons/icon-512.png'].map(appAsset);
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting())));
