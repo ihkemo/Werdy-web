@@ -8,10 +8,9 @@
   <meta name="apple-mobile-web-app-status-bar-style" id="appleStatusBarMeta" content="default" />
   <meta name="apple-mobile-web-app-title" content="Werdy" />
   <title>وِردي | Werdy</title>
-  <link rel="manifest" href="./manifest.json" />
-  <link rel="apple-touch-icon" href="./assets/icon-192-1xGgNftV.png" />
-  <script type="module" crossorigin src="./assets/index-1CRIaM0H.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-Bh1UH8rA.css">
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="styles.css?v=33" />
 </head>
 <body>
   
@@ -232,6 +231,7 @@
   </main>
 
   <script src="assets/quran/quran-data.js"></script>
-  <script src="app.js?v=35"></script>
+  <script type="module">if(location.protocol!=="file:")import("./native-notifications.js");</script>
+  <script src="app.js?v=36"></script>
 </body>
 </html>
