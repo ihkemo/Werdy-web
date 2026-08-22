@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="theme-color" id="themeColorMeta" content="#ded4c5" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" id="appleStatusBarMeta" content="default" />
+  <meta name="apple-mobile-web-app-status-bar-style" id="appleStatusBarMeta" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Werdy" />
   <title>وِردي | Werdy</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
-  <link rel="stylesheet" href="styles.css?v=35" />
+  <link rel="stylesheet" href="styles.css?v=39" />
 </head>
 <body>
   
@@ -46,14 +46,24 @@
   <main class="app-shell">
     <header class="topbar">
       <button class="icon-btn" id="menuBtn" aria-label="البحث في المصحف">⌕</button>
-      <div class="brand"><span class="brand-ar">وِردي</span><span class="brand-en">Werdy</span></div>
-      <button class="icon-btn theme-toggle-btn" id="settingsBtn" aria-label="تغيير المظهر"></button>
+      <button class="brand theme-brand-btn" id="themeBrandBtn" type="button" aria-label="تغيير المظهر"><span class="brand-ar">وِردي</span><span class="brand-en">Werdy</span></button>
+      <button class="icon-btn adhkar-header-btn" id="adhkarBtn" aria-label="الأذكار"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="7" cy="6" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="17" cy="7" r="2"/><circle cx="18" cy="12" r="2"/><circle cx="15" cy="16" r="2"/><circle cx="10" cy="17" r="2"/><circle cx="6" cy="14" r="2"/><path d="M5.7 8.1c-1 1.2-1.3 2.7-.7 4M17.2 18.2l2.8 2.8m-2.8 0 2.8-2.8"/></svg></button>
     </header>
     <div class="global-quran-search hidden" id="globalQuranSearch">
       <select id="globalSurahSelect" aria-label="السورة"></select>
       <input id="globalAyahInput" type="text" inputmode="numeric" pattern="[0-9٠-٩۰-۹]*" value="1" aria-label="رقم الآية" />
       <button class="small-btn" id="globalQuranGoBtn">انتقال</button>
     </div>
+
+    <section class="screen" id="adhkarScreen">
+      <div class="page-title-card"><h1 id="adhkarPageTitle">الأذكار</h1></div>
+      <div class="adhkar-tabs" role="tablist" aria-label="نوع الأذكار">
+        <button class="adhkar-tab active" id="morningAdhkarTab" type="button" data-adhkar="morning" role="tab" aria-selected="true">أذكار الصباح</button>
+        <button class="adhkar-tab" id="eveningAdhkarTab" type="button" data-adhkar="evening" role="tab" aria-selected="false">أذكار المساء</button>
+      </div>
+      <p class="adhkar-translation-note hidden" id="adhkarTranslationNote"></p>
+      <div class="adhkar-list" id="adhkarList"></div>
+    </section>
 
     <section class="screen" id="homeScreen">
       <div class="page-title-card"><h1>الأوراد</h1><p class="muted" id="todayLabel"></p><span class="count-badge hidden" id="awradCount">1</span></div>
@@ -62,12 +72,17 @@
 
     <section class="screen" id="wirdDetailsScreen">
       <div class="section-title-row"><button class="back-btn" data-target="homeScreen">→</button><h1>تفاصيل الوِرد</h1><span></span></div>
-      <article class="hero-card detail-hero"><span class="khatma-tag" id="detailKhatmaName">الختمة الأساسية</span><h2 id="detailRange">من الفاتحة 1 إلى البقرة 25</h2><p id="detailPreview">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ...</p></article>
       <div class="wird-day-nav"><button id="previousWirdBtn" aria-label="اليوم السابق">−</button><strong id="wirdDayLabel">وِرد اليوم الأول</strong><button id="nextWirdBtn" aria-label="اليوم التالي">+</button></div>
       <div class="detail-chart"><div class="chart-center"><strong id="detailPercent">0%</strong><small>تم اليوم</small></div></div>
+      <article class="hero-card detail-hero"><span class="khatma-tag" id="detailKhatmaName">الختمة الأساسية</span><h2 id="detailRange">من الفاتحة 1 إلى البقرة 25</h2><p id="detailPreview">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ...</p></article>
+      <div class="stats-grid khatma-stats detail-khatma-stats">
+        <article class="stat"><span>عدد أجزاء الوِرد</span><strong id="totalCompleted">0</strong><small>جزء</small></article>
+        <article class="stat"><span>عدد أرباع الوِرد</span><strong id="dailyAmountSummary">2</strong><small>ربع</small></article>
+        <article class="stat"><span>أيام القراءة</span><strong id="activeDaysCount">7</strong><small>أسبوعيًا</small></article>
+      </div>
       <div class="stats-grid detail-stats"><article class="stat"><span>تمت قراءته</span><strong id="doneCount">0</strong><small>ربع</small></article><article class="stat"><span>المتبقي</span><strong id="remainingCount">2</strong><small>ربع</small></article><article class="stat"><span>إجمالي الوِرد</span><strong id="detailTotal">2</strong><small>ربع</small></article><article class="stat schedule-stat"><span>مقارنة بالخطة</span><strong id="scheduleDelta">في الموعد</strong><small id="scheduleDeltaDetail">لا تأخير</small></article></div>
       <button class="primary-btn" id="startReadingBtn">ابدأ الوِرد</button>
-      <button class="secondary-btn" id="completeWirdDayBtn">تمت قراءة وِرد اليوم</button>
+      <button class="secondary-btn" id="completeWirdDayBtn">تمت قراءة وِرد اليوم والانتقال للوِرد التالي</button>
     </section>
 
     <div class="modal-backdrop hidden" id="reminderModal"><div class="mini-modal"><h2>موعد تذكير الوِرد</h2><input type="time" id="quickReminderTime" /><div class="modal-actions"><button class="text-btn" id="cancelReminderBtn">إلغاء</button><button class="primary-btn" id="saveReminderBtn">حفظ</button></div></div></div>
@@ -119,15 +134,15 @@
       <div class="page-title-card selector-title-card"><select id="khatmaSelector" aria-label="اختر الختمة"></select></div>
       <article class="hero-card khatma-summary">
         <div class="ring" id="khatmaRing"><strong id="khatmaPercent">0%</strong></div>
+        <p class="khatma-today-text" id="khatmaTodayText"></p>
         <div class="khatma-date-row"><p><span id="khatmaStartDateLabel">تاريخ البدء</span><strong id="khatmaStartDate"></strong></p><p><span id="khatmaExpectedDateLabel">الانتهاء المتوقع</span><strong id="khatmaExpectedDate"></strong></p></div>
         <p class="muted khatma-completion-date hidden" id="khatmaCompletionDate"></p>
         <p class="muted khatma-stage-line" id="khatmaStageLine"></p>
       </article>
-      <button class="simple-card khatma-start-card" id="khatmaStartCard">ابدأ وِرد اليوم</button>
-      <div class="stats-grid khatma-stats">
-        <article class="stat"><span>عدد أجزاء الوِرد</span><strong id="totalCompleted">1</strong><small>جزء</small></article>
-        <article class="stat"><span>عدد أرباع الوِرد</span><strong id="dailyAmountSummary">0</strong><small>ربع</small></article>
-        <article class="stat"><span>أيام القراءة</span><strong id="activeDaysCount">7</strong><small>أسبوعيًا</small></article>
+      <div class="khatma-action-strip">
+        <button class="khatma-action-btn" id="khatmaStartCard">ابدأ وِرد اليوم</button>
+        <button class="khatma-share-btn" id="khatmaShareBtn" aria-label="مشاركة وِرد اليوم"></button>
+        <button class="khatma-action-btn" id="khatmaCompleteBtn">تمت قراءته</button>
       </div>
       <article class="timeline-card">
         <div class="timeline-head"><strong>سجل الأوراد اليومية</strong><span class="muted">المقروء والقادم</span></div>
@@ -232,6 +247,7 @@
 
   <script src="assets/quran/quran-data.js"></script>
   <script type="module">if(window.Capacitor?.isNativePlatform?.())import("./native-notifications.js");</script>
-  <script src="app.js?v=37"></script>
+  <script src="assets/adhkar-data.js"></script>
+  <script src="app.js?v=43"></script>
 </body>
 </html>

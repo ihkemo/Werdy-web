@@ -427,3 +427,62 @@ body:not(.dark) .bottom-nav{border-color:#5a3e43}
 
 /* Prayer times are the primary content; settings follow them. */
 #groupScreen .prayer-times{margin:0 0 14px}.prayer-location-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.prayer-field input{text-align:center!important;text-align-last:center!important;border-radius:16px}
+
+/* Stable iPhone safe-area and cross-language notification alignment. */
+html,body{background:var(--status-bg)}
+.topbar,.topbar::before{background-color:var(--status-bg)}
+.notification-setting>div{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;text-align:start}
+.notification-setting>div label{width:100%;margin:0;text-align:start!important}
+.notification-setting>div small{width:max-content;max-width:100%;margin:5px 0 0;align-self:flex-start;text-align:center!important}
+.notification-setting>.small-btn{flex:0 0 96px;align-self:center;margin:0}
+.kahf-notification-setting{display:flex;flex-direction:column;align-items:stretch}
+.kahf-notification-setting>.notification-setting{width:100%}
+.kahf-notification-setting input[type="time"],.options-modal input[type="time"]{position:relative;left:auto!important;right:auto!important;align-self:center;box-sizing:border-box;max-width:100%}
+.options-modal{align-items:stretch}.options-modal>label{text-align:center!important}
+.options-modal .two-fields>div,.options-modal .two-fields label,.options-modal .two-fields input{direction:ltr;text-align:center!important;text-align-last:center!important}
+
+/* Home actions and current Werd summary. */
+.khatma-today-text{margin:18px 0 4px;padding:13px 14px;border:1px solid var(--border);border-radius:15px;background:var(--primary-strong);color:#fff;font-size:14px;line-height:1.7;text-align:center}
+body.dark .khatma-today-text{background:var(--primary)}
+.khatma-action-strip{display:grid;grid-template-columns:minmax(0,1fr) 48px minmax(0,1fr);gap:9px;align-items:center;margin:12px 0}
+.khatma-action-btn{min-height:58px;padding:10px 8px;border:1px solid var(--border);border-radius:18px;background:var(--primary-strong);color:#fff;font-weight:900}
+.khatma-action-btn:disabled{opacity:.52}
+.khatma-share-btn{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;padding:0;border:1.5px solid var(--border);background:var(--surface);color:var(--primary-strong);box-shadow:var(--shadow)}
+.khatma-share-btn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.card-actions.single-action{grid-template-columns:1fr}.card-actions.single-action button{border-inline:0}
+
+/* Werd details hierarchy. */
+.detail-khatma-stats{grid-template-columns:repeat(3,minmax(0,1fr));margin-top:14px}
+.detail-khatma-stats .stat{padding-inline:6px}.detail-khatma-stats .stat strong{font-size:25px}
+.detail-hero .khatma-tag{font-size:15px;padding:6px 13px}
+
+/* The latest completed Werd is the only timeline row that can be reversed. */
+.timeline-row.can-undo{border-color:var(--primary-strong);box-shadow:inset 0 0 0 2px var(--primary-strong),0 5px 14px color-mix(in srgb,var(--primary-strong) 18%,transparent)}
+body.dark .timeline-row.can-undo{border-color:#d9c8b8;box-shadow:inset 0 0 0 2px #d9c8b8,0 5px 14px rgba(0,0,0,.25)}
+
+/* The brand is the theme control; the prayer-bead button opens Adhkar. */
+.theme-brand-btn{appearance:none;cursor:pointer;transition:transform .12s ease,background-color .25s,color .25s}
+.theme-brand-btn:active{transform:scale(.97)}
+.theme-brand-btn:focus-visible,.adhkar-header-btn:focus-visible{outline:3px solid color-mix(in srgb,var(--primary) 55%,transparent);outline-offset:3px}
+.adhkar-header-btn svg{width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:1.55;stroke-linecap:round;stroke-linejoin:round}
+
+/* Morning and evening Adhkar. */
+#adhkarScreen{padding-bottom:calc(94px + var(--safe-bottom))}
+.adhkar-tabs{position:sticky;top:calc(var(--topbar-base) + var(--safe-top) + 8px);z-index:12;display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:2px 0 16px;padding:8px;border:1px solid var(--border);border-radius:22px;background:color-mix(in srgb,var(--surface) 92%,transparent);box-shadow:var(--shadow);backdrop-filter:blur(15px)}
+.adhkar-translation-note{margin:-7px 4px 15px;padding:10px 13px;border:1px solid var(--border);border-radius:14px;background:var(--surface-2);color:var(--muted);font-size:13px;line-height:1.55;text-align:center}
+.adhkar-tab{min-height:54px;padding:10px;border:1px solid var(--border);border-radius:16px;background:var(--surface-2);color:var(--text);font-weight:800;transition:background .2s,color .2s,transform .12s}
+.adhkar-tab.active{background:var(--primary-strong);border-color:var(--primary-strong);color:#fff;box-shadow:0 6px 15px color-mix(in srgb,var(--primary-strong) 24%,transparent)}
+.adhkar-tab:active{transform:scale(.98)}
+.adhkar-list{display:grid;gap:14px}
+.adhkar-section-label{margin:7px 0 0;padding:12px 16px;border:1px solid var(--border);border-radius:16px;background:var(--primary-strong);color:#fff;text-align:center;font-weight:900}
+.adhkar-card{position:relative;padding:18px 16px 16px;border:1.5px solid var(--border);border-radius:22px;background:var(--surface);box-shadow:var(--shadow)}
+.adhkar-card h2{margin:0 0 14px;padding:10px 12px;border-radius:14px;background:var(--surface-2);color:var(--primary-strong);font-size:20px;text-align:center}
+.adhkar-bismillah{margin:4px auto 14px;color:var(--primary-strong);font-size:22px;font-weight:800;text-align:center;direction:rtl}
+.adhkar-quran-text,.dua-adhkar-card p{margin:0;color:var(--text);direction:rtl;text-align:center;line-height:2.15}
+.adhkar-card [lang="en"]{direction:ltr;text-align:left}
+.adhkar-quran-text{font-size:calc(var(--quran-size) * .82)}
+.dua-adhkar-card p{font-size:19px;line-height:1.95}
+.adhkar-ayah{display:inline}.adhkar-card .ayah-num{display:inline-grid;place-items:center;min-width:30px;height:30px;margin:0 4px;border:1px solid var(--primary);border-radius:50%;font-size:14px;vertical-align:middle}
+.adhkar-repeat{display:block;width:max-content;min-width:48px;margin:14px auto 0;padding:6px 13px;border:1px solid var(--border);border-radius:999px;background:var(--surface-2);color:var(--primary-strong);font-weight:900;text-align:center;direction:ltr}
+body.dark .adhkar-tab.active,body.dark .adhkar-section-label{background:#7f584d;color:#fff}
+body.dark .adhkar-card h2,body.dark .adhkar-bismillah,body.dark .adhkar-repeat{color:#f0ded2}
