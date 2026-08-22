@@ -1,5 +1,6 @@
 
 :root{
+  color-scheme:light;
   --safe-top:env(safe-area-inset-top,0px);
   --safe-bottom:env(safe-area-inset-bottom,0px);
   --topbar-base:58px;
@@ -27,6 +28,7 @@ body{
   background:#d2c3b2;
   color:var(--text);
 }
+body.dark{color-scheme:dark}
 button,input,select{font:inherit}
 button{cursor:pointer}
 .app-shell{
@@ -486,3 +488,19 @@ body.dark .timeline-row.can-undo{border-color:#d9c8b8;box-shadow:inset 0 0 0 2px
 .adhkar-repeat{display:block;width:max-content;min-width:48px;margin:14px auto 0;padding:6px 13px;border:1px solid var(--border);border-radius:999px;background:var(--surface-2);color:var(--primary-strong);font-weight:900;text-align:center;direction:ltr}
 body.dark .adhkar-tab.active,body.dark .adhkar-section-label{background:#7f584d;color:#fff}
 body.dark .adhkar-card h2,body.dark .adhkar-bismillah,body.dark .adhkar-repeat{color:#f0ded2}
+
+/* Final iOS stability layer: keep status background and notification fields aligned after theme/language changes. */
+html,body{min-height:100%;background:var(--status-bg)}
+body::before{content:"";position:fixed;z-index:19;top:0;left:0;right:0;height:var(--safe-top);background:var(--status-bg);pointer-events:none}
+.app-shell{min-height:var(--viewport-height,100vh);background:var(--bg)}
+.notification-setting{display:grid!important;grid-template-columns:minmax(0,1fr) 96px;align-items:center;gap:14px;direction:inherit}
+.notification-setting>div{grid-column:1;min-width:0;align-items:flex-start!important;text-align:start!important}
+.notification-setting>.small-btn{grid-column:2;width:96px;margin:0!important;justify-self:stretch}
+.notification-setting>div label{width:100%;text-align:start!important}
+.notification-setting>div small{align-self:flex-start!important;text-align:start!important}
+.kahf-notification-setting{display:flex!important;flex-direction:column;align-items:stretch}
+.kahf-notification-setting>.notification-setting{display:grid!important;width:100%}
+.kahf-notification-setting>.kahf-time-label,.kahf-notification-setting>.time-preview{width:100%;text-align:center!important}
+.kahf-notification-setting>input[type="time"],.options-modal>input[type="time"]{position:static!important;display:block!important;width:100%!important;max-width:100%!important;margin-inline:0!important;transform:none!important;direction:ltr!important;text-align:center!important;text-align-last:center!important}
+.options-modal>label,.options-modal>.time-preview{width:100%;text-align:center!important}
+.options-modal .two-fields>div,.options-modal .two-fields label,.options-modal .two-fields input{text-align:center!important;text-align-last:center!important}
