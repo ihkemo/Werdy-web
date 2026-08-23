@@ -2,7 +2,7 @@
   "name": "وِردي | Werdy",
   "short_name": "وِردي",
   "id": "./",
-  "start_url": "./",
+  "start_url": "./?release=18",
   "scope": "./",
   "display": "standalone",
   "background_color": "#ded4c5",
