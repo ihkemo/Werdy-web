@@ -2,11 +2,11 @@
   "name": "وِردي | Werdy",
   "short_name": "وِردي",
   "id": "./",
-  "start_url": "./?release=19",
+  "start_url": "./?release=20",
   "scope": "./",
   "display": "standalone",
   "background_color": "#ded4c5",
-  "theme_color": "#3b241f",
+  "theme_color": "#ded4c5",
   "lang": "ar",
   "dir": "rtl",
   "icons": [
