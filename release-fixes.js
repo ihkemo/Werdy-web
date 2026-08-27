@@ -1,19 +1,6 @@
 /* Werdy release fixes kept separate so web and native builds run identical code. */
 let timelineExpanded=false;
 
-function seedPriorWerds(k,count){
-  const a=amount(k),totalDays=Math.ceil(240/a),safe=Math.max(0,Math.min(totalDays,Number(count)||0));
-  k.priorWerds=safe;k.readings={};
-  for(let i=0;i<safe;i++)k.readings[String(i)]=Math.min(a,240-i*a);
-  k.total=Math.min(240,safe*a);delete k.reopenDay;delete k.lastCompletionAt;
-}
-function nextFajrAfter(value){
-  if(!value)return null;
-  const next=new Date(value);next.setDate(next.getDate()+1);
-  const [hour,minute]=String(state.prayer.fajr||'05:00').split(':').map(Number);
-  next.setHours(hour||0,minute||0,0,0);return next;
-}
-function dailyWerdLocked(k){const unlock=nextFajrAfter(k.lastCompletionAt);return Boolean(unlock&&new Date()<unlock)}
 function effectiveWerdDate(now=new Date()){
   const effective=new Date(now),[hour,minute]=String(state.prayer.fajr||'05:00').split(':').map(Number),todayFajr=new Date(now);
   todayFajr.setHours(hour||0,minute||0,0,0);
@@ -28,18 +15,24 @@ currentScheduleIndex=k=>{
   while(cursor<=end){if(k.days.includes(jsDays[cursor.getDay()]))count++;cursor.setDate(cursor.getDate()+1)}
   return Math.max(0,count-1);
 };
-// The range card, action and collapsed history row all point at this same index.
+function isScheduledToday(k){const today=effectiveWerdDate(),start=new Date(`${k.startDate}T12:00:00`);return today>=start&&k.days.includes(jsDays[today.getDay()])}
+function nextScheduledDate(k){if(!k.days.length)return null;const today=effectiveWerdDate(),start=new Date(`${k.startDate}T12:00:00`),cursor=new Date(today<start?start:today);cursor.setHours(12,0,0,0);while(!k.days.includes(jsDays[cursor.getDay()]))cursor.setDate(cursor.getDate()+1);return cursor}
+function scheduledWerdCount(k){const start=new Date(`${k.startDate}T12:00:00`),end=effectiveWerdDate(),cursor=new Date(start);let count=0;if(end<start)return 0;while(cursor<=end){if(k.days.includes(jsDays[cursor.getDay()]))count++;cursor.setDate(cursor.getDate()+1)}return count}
+function scheduleProgress(k){const a=amount(k),due=scheduledWerdCount(k),todayIndex=Math.max(0,currentScheduleIndex(k)),todayComplete=reading(k,todayIndex)>=a,expected=Math.max(0,due-(isScheduledToday(k)&&!todayComplete?1:0)),completed=Object.values(k.readings||{}).filter(value=>Number(value)>=a).length;return{completed,expected,delta:completed-expected}}
+renderScheduleDelta=()=>{const {completed,expected,delta}=scheduleProgress(selected());$('scheduleDelta').textContent=delta>0?L(`متقدم ${delta} يوم`,`${delta} Day${delta===1?'':'s'} Ahead`):delta<0?L(`متأخر ${Math.abs(delta)} يوم`,`${Math.abs(delta)} Day${Math.abs(delta)===1?'':'s'} Behind`):L('في الموعد','On Schedule');$('scheduleDeltaDetail').textContent=L(`${completed} من ${expected} وِرد مستحق`,`${completed} Of ${expected} Due Werd${expected===1?'':'s'}`)};
+// A completed Werd remains today's Werd. Rest days preview the next scheduled one.
 function displayedWerdIndex(k){
-  const scheduled=currentScheduleIndex(k),unread=Math.max(firstUnreadIndex(k),Number(k.priorWerds)||0);
-  return dailyWerdLocked(k)?Math.max(scheduled,unread-1):Math.max(scheduled,unread);
+  const totalDays=Math.ceil(240/amount(k));
+  return Math.min(totalDays-1,isScheduledToday(k)?currentScheduleIndex(k):scheduledWerdCount(k));
 }
 function scheduleVerification(k,index=firstUnreadIndex(k)){
   const date=scheduleDate(k,index),day=date.toLocaleDateString(isEn()?'en-GB':'ar-EG-u-nu-latn',{weekday:'long'});
   return L(`موعد الوِرد رقم ${index+1}: ${day}، ${localizedDate(date)}`,`Werd ${index+1} Is Scheduled For ${day}, ${localizedDate(date)}`);
 }
 function updateKhatmaSchedulePreview(){
-  const k=selected(),draft={...k,startDate:$('khatmaStartDateInput').value||dateKey(),priorWerds:Number(westernDigits($('khatmaPriorWerds').value))||0};
+  const k=selected(),draft={...k,startDate:$('khatmaStartDateInput').value||dateKey()};
   const todayIndex=displayedWerdIndex(draft);
+  $('khatmaStartDateDisplay').textContent=localizedDate(draft.startDate);
   $('khatmaSchedulePreview').textContent=scheduleVerification(draft,todayIndex);
 }
 
@@ -47,23 +40,23 @@ const openOptionsCalendarCore=openOptions;
 openOptions=(isNew=false)=>{
   openOptionsCalendarCore(isNew);const k=selected(),locked=!isNew&&hasStartedReading(k);
   $('khatmaStartDateInputLabel').textContent=L('تاريخ بداية الختمة','Khatma Start Date');
-  $('khatmaPriorWerdsLabel').textContent=L('الأوراد المقروءة سابقًا','Previously Read Werds');
-  $('khatmaStartDateInput').value=k.startDate||dateKey();$('khatmaPriorWerds').value=k.priorWerds||0;
-  for(const field of [$('khatmaStartDateInput'),$('khatmaPriorWerds')]){field.readOnly=locked;field.dataset.locked=String(locked)}
+  $('khatmaStartDateInput').value=k.startDate||dateKey();$('khatmaStartDateInput').readOnly=locked;$('khatmaStartDateInput').dataset.locked=String(locked);
   updateKhatmaSchedulePreview();
 };
 $('khatmaStartDateInput').oninput=updateKhatmaSchedulePreview;
-$('khatmaPriorWerds').oninput=()=>{$('khatmaPriorWerds').value=Math.max(0,Number(westernDigits($('khatmaPriorWerds').value))||0);updateKhatmaSchedulePreview()};
 const saveOptionsCalendarCore=$('saveKhatmaOptionsBtn').onclick;
+let settingsReturnKhatmaId=null;
 $('saveKhatmaOptionsBtn').onclick=async()=>{
   const k=selected(),locked=!editingNewKhatma&&hasStartedReading(k);
-  if(!locked){const {p,q}=normalizeOptions('save');k.parts=p;k.quarters=q;k.startDate=$('khatmaStartDateInput').value||dateKey();seedPriorWerds(k,$('khatmaPriorWerds').value)}
+  if(!locked){const {p,q}=normalizeOptions('save');k.parts=p;k.quarters=q;k.startDate=$('khatmaStartDateInput').value||dateKey()}
   state.dayIndex=displayedWerdIndex(k);
   await saveOptionsCalendarCore();
+  if(settingsReturnKhatmaId!==null&&$('khatmaOptionsModal').classList.contains('hidden')){state.selectedId=settingsReturnKhatmaId;settingsReturnKhatmaId=null;state.dayIndex=displayedWerdIndex(selected());persist();renderState()}
 };
-
-const completeCurrentWirdCore=completeCurrentWird;
-completeCurrentWird=async()=>{const completed=await completeCurrentWirdCore();if(completed){selected().lastCompletionAt=new Date().toISOString();persist()}return completed};
+const cancelOptionsStableCore=$('cancelKhatmaOptionsBtn').onclick;
+$('cancelKhatmaOptionsBtn').onclick=()=>{cancelOptionsStableCore();if(settingsReturnKhatmaId!==null){state.selectedId=settingsReturnKhatmaId;settingsReturnKhatmaId=null;state.dayIndex=displayedWerdIndex(selected());persist();renderState()}};
+const renderSettingsKhatmasStableCore=renderSettingsKhatmas;
+renderSettingsKhatmas=()=>{renderSettingsKhatmasStableCore();document.querySelectorAll('.edit-khatma-name').forEach(button=>button.onclick=()=>{settingsReturnKhatmaId=state.selectedId;state.selectedId=Number(button.dataset.id);openOptions(false)})};
 
 const renderTimelineFull=renderTimeline;
 renderTimeline=()=>{
@@ -75,7 +68,7 @@ renderTimeline=()=>{
     undoRow.onclick=async()=>{
       const approved=await appDialog({title:L('تغيير حالة الوِرد','Change Werd Status'),message:L(`هل تريد إعادة وِرد اليوم ${index+1} إلى حالة «غير مقروء»؟`,`Mark Werd Day ${index+1} As Unread?`),confirmText:L('تأكيد','Confirm'),showCancel:true});
       if(!approved)return;
-      const old=reading(k,index);k.readings[String(index)]=0;k.total=Math.max(0,k.total-old);k.reopenDay=index;delete k.lastCompletionAt;state.dayIndex=index;persist();renderState();
+      const old=reading(k,index);k.readings[String(index)]=0;k.total=Math.max(0,k.total-old);k.reopenDay=index;state.dayIndex=index;persist();renderState();
     };
   }
   $('timelineToggleLabel').textContent=timelineExpanded?L('إخفاء السجل','Hide History'):L('إظهار الكل','Show All');
@@ -85,12 +78,18 @@ $('timelineToggle').onclick=()=>{timelineExpanded=!timelineExpanded;renderTimeli
 
 const renderStateReleaseCore=renderState;
 renderState=()=>{
-  renderStateReleaseCore();const k=selected(),a=amount(k),done=reading(k,state.dayIndex),locked=dailyWerdLocked(k);
-  $('khatmaStartCard').disabled=done>=a||locked;
-  $('khatmaShareBtn').disabled=false;$('khatmaShareBtn').setAttribute('aria-disabled','false');$('khatmaShareBtn').tabIndex=0;
-  $('khatmaStartCard').textContent=done>=a||locked?L('تمت قراءة وِرد اليوم ✓','Today’s Werd Has Been Read ✓'):L('ابدأ وِرد اليوم','Start Today’s Werd');
+  renderStateReleaseCore();const k=selected(),a=amount(k),done=reading(k,state.dayIndex),restDay=!isScheduledToday(k),{delta}=scheduleProgress(k),nextDate=nextScheduledDate(k);
+  $('khatmaStartCard').disabled=done>=a||restDay;
+  $('khatmaQuickCompleteBtn').disabled=done>=a||restDay;$('khatmaQuickCompleteBtn').classList.toggle('completed',done>=a);
+  $('khatmaQuickCompleteBtn').setAttribute('aria-label',done>=a?L('تمت قراءة وِرد اليوم','Today’s Werd Has Been Read'):L('تسجيل وِرد اليوم كمقروء','Mark Today’s Werd As Read'));
+  $('khatmaShareBtn').disabled=restDay;$('khatmaShareBtn').setAttribute('aria-disabled',String(restDay));$('khatmaShareBtn').tabIndex=restDay?-1:0;
+  $('khatmaStartCard').textContent=restDay?L('الوِرد القادم','Next Scheduled Werd'):done>=a?L('تمت قراءة وِرد اليوم ✓','Today’s Werd Has Been Read ✓'):L('ابدأ وِرد اليوم','Start Today’s Werd');
+  $('khatmaScheduleStatus').textContent=delta>0?L(`أنت متقدم عن موعد الختمة الطبيعي بـ ${delta} يوم`,`You Are ${delta} Day${delta===1?'':'s'} Ahead Of The Natural Khatma Schedule`):delta<0?L(`أنت متأخر عن موعد الختمة الطبيعي بـ ${Math.abs(delta)} يوم`,`You Are ${Math.abs(delta)} Day${Math.abs(delta)===1?'':'s'} Behind The Natural Khatma Schedule`):L('أنت في موعد الختمة الطبيعي','You Are On The Natural Khatma Schedule');
   $('khatmaStageLine').textContent=`${$('khatmaStageLine').textContent} · ${scheduleVerification(k,state.dayIndex)}`;
+  $('khatmaRestNote').classList.toggle('hidden',!restDay);$('khatmaRestNote').textContent=restDay?(nextDate?L(`اليوم إجازة من هذا الوِرد. الوِرد القادم ${nextDate.toLocaleDateString('ar-EG-u-nu-latn',{weekday:'long'})}، ${localizedDate(nextDate)}.`,`Today Is A Rest Day For This Werd. The Next Werd Is ${nextDate.toLocaleDateString('en-GB',{weekday:'long'})}, ${localizedDate(nextDate)}.`):L('اختر يوم قراءة واحدًا على الأقل من إعدادات الختمة.','Choose At Least One Reading Day In The Khatma Settings.')):'';
+  document.querySelector('.khatma-summary').classList.toggle('rest-day',restDay);document.querySelector('.khatma-action-strip').classList.toggle('rest-day',restDay);
 };
+$('khatmaQuickCompleteBtn').onclick=async()=>{if(!isScheduledToday(selected()))return;const approved=await appDialog({title:L('تأكيد قراءة الوِرد','Confirm Werd Reading'),message:L('هل أنت متأكد أنك تريد تسجيل هذا الوِرد كمقروء؟','Are You Sure You Want To Mark This Werd As Read?'),confirmText:L('نعم','Yes'),cancelText:L('لا','No'),showCancel:true});if(!approved||!await completeCurrentWird())return;renderState()};
 
 $('settingsHeaderBtn').onclick=()=>showScreen('settingsScreen');
 const adhkarNav=document.querySelector('.nav-item[data-target="adhkarScreen"]');
@@ -99,6 +98,7 @@ const applyLanguageReleaseCore=applyLanguage;
 applyLanguage=()=>{
   applyLanguageReleaseCore();adhkarNav.querySelector('span').textContent=L('الأذكار','Adhkar');
   $('settingsHeaderBtn').setAttribute('aria-label',L('الإعدادات','Settings'));
+  $('completeWirdDayBtn').textContent=L('تمت قراءة وِرد اليوم','Mark Today’s Werd As Read');
 };
 
 $('languageSelect').onchange=e=>{
@@ -137,17 +137,17 @@ window.addEventListener('werdy:notification-open',event=>{
 
 const showScreenReleaseCore=showScreen;
 showScreen=id=>{
+  if(id==='khatmaScreen')state.dayIndex=displayedWerdIndex(selected());
   showScreenReleaseCore(id);
-  if(id==='khatmaScreen'){
-    const intended=displayedWerdIndex(selected());
-    if(state.dayIndex!==intended){state.dayIndex=intended;renderState()}
-  }
+  if(id==='khatmaScreen')renderState();
   if(id==='mushafScreen')document.body.classList.remove('mushaf-controls-hidden');
 };
+$('khatmaSelector').onchange=event=>{state.selectedId=Number(event.target.value);state.dayIndex=displayedWerdIndex(selected());persist();renderState()};
 
-for(const id of ['khatmaReminderTime','kahfNotificationTime']){
+for(const id of ['khatmaReminderTime','kahfNotificationTime','khatmaStartDateInput']){
   const input=$(id),shell=input?.closest('.time-field-shell');
-  shell?.addEventListener('click',()=>{input.focus({preventScroll:true});try{input.showPicker?.()}catch{}});
+  const pickerShell=shell||input?.closest('.date-field-shell');
+  pickerShell?.addEventListener('click',()=>{if(input.readOnly||input.disabled)return;input.focus({preventScroll:true});try{input.showPicker?.()}catch{}});
 }
 
-renderState();loadPrayerTimes();
+state.dayIndex=displayedWerdIndex(selected());renderState();loadPrayerTimes();

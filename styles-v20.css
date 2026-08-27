@@ -233,11 +233,13 @@ input[type="time"]{direction:ltr;text-align:center}
   font-size:12px;
 }
 .day-chip.active{
-  background:var(--surface-2);
-  color:var(--text);
-  border-color:var(--primary);
-  font-weight:800;
+  background:var(--primary-strong);
+  color:#fff;
+  border-color:var(--primary-strong);
+  box-shadow:0 4px 12px color-mix(in srgb,var(--primary-strong) 28%,transparent);
+  font-weight:900;
 }
+.day-chip:not(.active){color:var(--muted);border-style:dashed;opacity:.62}
 .segmented{display:flex;background:var(--surface-2);border:1px solid var(--border);border-radius:14px;padding:4px}
 .seg{flex:1;border:0;background:transparent;color:var(--text);padding:10px;border-radius:11px}
 .seg.active{background:var(--surface);color:var(--text);box-shadow:0 2px 10px rgba(0,0,0,.05)}
@@ -564,6 +566,13 @@ body::before{content:"";position:fixed;z-index:19;top:0;left:0;right:0;height:va
   max-inline-size:100%!important;
   align-self:stretch!important;
 }
+.options-modal .centered-field{text-align:center!important;text-align-last:center!important}
+.khatma-origin-fields{display:flex;flex-direction:column;align-items:stretch;width:100%}
+.khatma-origin-fields>label{display:block;width:100%;margin:14px auto 8px;text-align:center!important;font-weight:800}
+.date-field-shell{position:relative;display:grid;place-items:center;width:100%;height:54px;margin:0 auto;overflow:hidden;border:1px solid var(--border);border-radius:14px;background:var(--surface);outline:1px solid var(--border)}
+.date-field-value{position:absolute;inset:0;z-index:1;display:grid;place-items:center;width:100%;height:100%;padding:0 14px;color:var(--text);direction:ltr;text-align:center;pointer-events:none}
+.date-field-shell>input[type="date"]{position:absolute!important;inset:0!important;z-index:2;display:block!important;width:100%!important;height:100%!important;margin:0!important;padding:0!important;border:0!important;outline:0!important;background:transparent!important;box-shadow:none!important;opacity:0!important;cursor:pointer}
+.date-field-shell>input[type="date"][readonly]{cursor:default}
 
 /* Version-one feature gates: keep unfinished controls in source without shipping dead UI. */
 .release-v1 .prayer-row{grid-template-columns:1fr 1fr}
@@ -575,8 +584,17 @@ body::before{content:"";position:fixed;z-index:19;top:0;left:0;right:0;height:va
 .khatma-action-strip{position:relative;display:block;margin:12px 22px}
 .khatma-action-strip .khatma-action-btn{width:100%;padding-inline:58px}
 .khatma-action-strip .khatma-share-btn{position:absolute;z-index:2;top:50%;right:9px;transform:translateY(-50%);width:44px;height:44px;border-color:color-mix(in srgb,#fff 42%,var(--border));background:color-mix(in srgb,#fff 13%,transparent);color:#fff}
-.khatma-action-strip .khatma-share-btn,.khatma-action-strip .khatma-share-btn:disabled{opacity:1!important;filter:none!important;pointer-events:auto!important;cursor:pointer;background:var(--primary-strong)!important;color:#fff!important;border-color:color-mix(in srgb,#fff 55%,var(--border))!important;box-shadow:0 2px 7px color-mix(in srgb,var(--primary-strong) 18%,transparent)}
+.khatma-action-strip .khatma-share-btn,.khatma-action-strip .khatma-quick-complete-btn{opacity:1;filter:none;cursor:pointer;background:var(--primary-strong);color:#fff;border-color:color-mix(in srgb,#fff 55%,var(--border));box-shadow:0 2px 7px color-mix(in srgb,var(--primary-strong) 18%,transparent)}
 html[dir="ltr"] .khatma-action-strip .khatma-share-btn{right:auto;left:9px}
+.khatma-quick-complete-btn{position:absolute;z-index:2;top:50%;left:9px;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;display:grid;place-items:center;padding:0;border:1.5px solid;font-size:24px;font-weight:900}
+html[dir="ltr"] .khatma-action-strip .khatma-quick-complete-btn{left:auto;right:9px}
+.khatma-action-strip .khatma-quick-complete-btn.completed,.khatma-action-strip .khatma-quick-complete-btn:disabled{background:color-mix(in srgb,var(--primary-strong) 60%,#777);cursor:default;box-shadow:none}
+.khatma-action-strip.rest-day,.khatma-summary.rest-day{opacity:.5;filter:saturate(.45)}
+.khatma-action-strip.rest-day button{pointer-events:none}
+.khatma-schedule-status,.khatma-rest-note{margin:10px 0 0;padding:9px 12px;border-radius:13px;text-align:center;font-size:13px;line-height:1.6}
+.khatma-schedule-status{background:color-mix(in srgb,var(--primary) 12%,var(--surface));color:var(--text);font-weight:800}
+.khatma-rest-note{background:var(--surface-2);border:1px dashed var(--border);color:var(--muted)}
+body.dark .day-chip.active{background:var(--primary-strong);color:#fff;border-color:#ead9ca}
 .khatma-action-btn:disabled{opacity:.5;cursor:default;filter:saturate(.55)}
 .timeline-toggle{width:100%;display:grid;grid-template-columns:1fr auto 24px;gap:8px;align-items:center;padding:14px 16px;border:0;border-bottom:1px solid var(--border);background:transparent;color:var(--text);text-align:start}
 .timeline-toggle span{color:var(--muted);font-size:12px}.timeline-toggle strong{font-size:17px}.timeline-toggle b{font-size:20px;transition:transform .2s}.timeline-toggle.expanded b{transform:rotate(180deg)}

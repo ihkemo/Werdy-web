@@ -79,7 +79,7 @@
       <div class="detail-chart"><div class="chart-center"><strong id="detailPercent">0%</strong><small>تم اليوم</small></div></div>
       <article class="hero-card detail-hero"><span class="khatma-tag" id="detailKhatmaName">الختمة الأساسية</span><h2 id="detailRange">من الفاتحة 1 إلى البقرة 25</h2><p id="detailPreview">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ...</p></article>
       <button class="primary-btn" id="startReadingBtn">ابدأ الوِرد</button>
-      <button class="secondary-btn" id="completeWirdDayBtn">تمت قراءة وِرد اليوم والانتقال للوِرد التالي</button>
+      <button class="secondary-btn" id="completeWirdDayBtn">تمت قراءة وِرد اليوم</button>
       <div class="stats-grid khatma-stats detail-khatma-stats">
         <article class="stat"><span>عدد أجزاء الوِرد</span><strong id="totalCompleted">0</strong><small>جزء</small></article>
         <article class="stat"><span>عدد أرباع الوِرد</span><strong id="dailyAmountSummary">2</strong><small>ربع</small></article>
@@ -89,7 +89,7 @@
     </section>
 
     <div class="modal-backdrop hidden" id="reminderModal"><div class="mini-modal"><h2>موعد تذكير الوِرد</h2><input type="time" id="quickReminderTime" /><div class="modal-actions"><button class="text-btn" id="cancelReminderBtn">إلغاء</button><button class="primary-btn" id="saveReminderBtn">حفظ</button></div></div></div>
-    <div class="modal-backdrop hidden" id="khatmaOptionsModal"><div class="mini-modal options-modal"><h2 id="khatmaOptionsTitle">إعدادات الختمة</h2><label id="khatmaEditableNameLabel">اسم الختمة</label><input type="text" id="khatmaEditableName" maxlength="60"/><label>وقت التذكير اليومي</label><div class="time-field-shell"><span class="time-field-value" id="khatmaReminderTimeDisplay" aria-hidden="true">09:00 AM</span><input type="time" id="khatmaReminderTime"/></div><small class="time-preview" id="khatmaReminderPreview"></small><div class="two-fields khatma-origin-fields"><div><label id="khatmaStartDateInputLabel">تاريخ بداية الختمة</label><input type="date" id="khatmaStartDateInput"/></div><div><label id="khatmaPriorWerdsLabel">الأوراد المقروءة سابقًا</label><input type="text" inputmode="numeric" pattern="[0-9٠-٩۰-۹]*" id="khatmaPriorWerds"/></div></div><small class="time-preview" id="khatmaSchedulePreview"></small><label>أيام الوِرد</label><div class="days-grid" id="khatmaDaysGrid"></div><label>مقدار الوِرد اليومي</label><div class="two-fields"><div><label>الأجزاء</label><input type="text" inputmode="numeric" pattern="[0-9٠-٩۰-۹]*" id="khatmaParts"/></div><div><label>الأرباع</label><input type="text" inputmode="numeric" pattern="[0-9٠-٩۰-۹]*" id="khatmaQuarters"/></div></div><small class="validation-message" id="khatmaAmountError"></small><div class="modal-actions"><button class="text-btn" id="cancelKhatmaOptionsBtn">إلغاء</button><button class="primary-btn" id="saveKhatmaOptionsBtn">حفظ</button></div></div></div>
+    <div class="modal-backdrop hidden" id="khatmaOptionsModal"><div class="mini-modal options-modal"><h2 id="khatmaOptionsTitle">إعدادات الختمة</h2><label id="khatmaEditableNameLabel">اسم الختمة</label><input class="centered-field" type="text" id="khatmaEditableName" maxlength="60"/><label>وقت التذكير اليومي</label><div class="time-field-shell"><span class="time-field-value" id="khatmaReminderTimeDisplay" aria-hidden="true">09:00 AM</span><input type="time" id="khatmaReminderTime"/></div><small class="time-preview" id="khatmaReminderPreview"></small><div class="khatma-origin-fields"><label id="khatmaStartDateInputLabel">تاريخ بداية الختمة</label><div class="date-field-shell"><span class="date-field-value" id="khatmaStartDateDisplay" aria-hidden="true"></span><input type="date" id="khatmaStartDateInput"/></div></div><small class="time-preview" id="khatmaSchedulePreview"></small><label>أيام الوِرد</label><div class="days-grid" id="khatmaDaysGrid"></div><label>مقدار الوِرد اليومي</label><div class="two-fields"><div><label>الأجزاء</label><input type="text" inputmode="numeric" pattern="[0-9٠-٩۰-۹]*" id="khatmaParts"/></div><div><label>الأرباع</label><input type="text" inputmode="numeric" pattern="[0-9٠-٩۰-۹]*" id="khatmaQuarters"/></div></div><small class="validation-message" id="khatmaAmountError"></small><div class="modal-actions"><button class="text-btn" id="cancelKhatmaOptionsBtn">إلغاء</button><button class="primary-btn" id="saveKhatmaOptionsBtn">حفظ</button></div></div></div>
     <div class="modal-backdrop hidden" id="appDialog" role="dialog" aria-modal="true" aria-labelledby="appDialogTitle" aria-describedby="appDialogMessage"><div class="mini-modal app-dialog-card"><div class="app-dialog-icon" id="appDialogIcon">!</div><h2 id="appDialogTitle"></h2><p id="appDialogMessage"></p><div class="modal-actions app-dialog-actions"><button class="text-btn" id="appDialogCancel"></button><button class="primary-btn" id="appDialogConfirm"></button></div></div></div>
 
     <section class="screen" id="readingScreen">
@@ -139,12 +139,15 @@
         <div class="ring" id="khatmaRing"><strong id="khatmaPercent">0%</strong></div>
         <p class="khatma-today-text" id="khatmaTodayText"></p>
         <div class="khatma-date-row"><p><span id="khatmaStartDateLabel">تاريخ البدء</span><strong id="khatmaStartDate"></strong></p><p><span id="khatmaExpectedDateLabel">الانتهاء المتوقع</span><strong id="khatmaExpectedDate"></strong></p></div>
+        <p class="khatma-schedule-status" id="khatmaScheduleStatus"></p>
+        <p class="khatma-rest-note hidden" id="khatmaRestNote"></p>
         <p class="muted khatma-completion-date hidden" id="khatmaCompletionDate"></p>
         <p class="muted khatma-stage-line" id="khatmaStageLine"></p>
       </article>
       <div class="khatma-action-strip">
         <button class="khatma-action-btn" id="khatmaStartCard">ابدأ وِرد اليوم</button>
         <button class="khatma-share-btn" id="khatmaShareBtn" aria-label="مشاركة وِرد اليوم"></button>
+        <button class="khatma-quick-complete-btn" id="khatmaQuickCompleteBtn" aria-label="تمت قراءة وِرد اليوم">✓</button>
       </div>
       <article class="timeline-card">
         <button class="timeline-toggle" id="timelineToggle" type="button"><strong>سجل الأوراد اليومية</strong><span id="timelineToggleLabel">إظهار الكل</span><b aria-hidden="true">⌄</b></button>
