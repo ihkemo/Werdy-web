@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ar" dir="rtl" data-build="26">
+<html lang="ar" dir="rtl" data-build="30">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
@@ -8,11 +8,10 @@
   <meta name="apple-mobile-web-app-status-bar-style" id="appleStatusBarMeta" content="default" />
   <meta name="apple-mobile-web-app-title" content="Werdy" />
   <title>وِردي | Werdy</title>
-  <meta name="werdy-build" content="26" />
-  <link rel="manifest" href="./manifest.json?v=26" />
-  <link rel="apple-touch-icon" href="./assets/icon-192-1xGgNftV.png" />
-  <script type="module" crossorigin src="./assets/index-ByJYlBrs.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-DvYxxXbw.css">
+  <meta name="werdy-build" content="30" />
+  <link rel="manifest" href="manifest.json?v=30" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="styles-v20.css?v=30" />
 </head>
 <body class="release-v1">
   
@@ -79,14 +78,14 @@
       <div class="wird-day-nav"><button id="previousWirdBtn" aria-label="اليوم السابق">−</button><strong id="wirdDayLabel">وِرد اليوم الأول</strong><button id="nextWirdBtn" aria-label="اليوم التالي">+</button></div>
       <div class="detail-chart"><div class="chart-center"><strong id="detailPercent">0%</strong><small>تم اليوم</small></div></div>
       <article class="hero-card detail-hero"><span class="khatma-tag" id="detailKhatmaName">الختمة الأساسية</span><h2 id="detailRange">من الفاتحة 1 إلى البقرة 25</h2><p id="detailPreview">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ...</p></article>
+      <button class="primary-btn" id="startReadingBtn">ابدأ الوِرد</button>
+      <button class="secondary-btn" id="completeWirdDayBtn">تمت قراءة وِرد اليوم والانتقال للوِرد التالي</button>
       <div class="stats-grid khatma-stats detail-khatma-stats">
         <article class="stat"><span>عدد أجزاء الوِرد</span><strong id="totalCompleted">0</strong><small>جزء</small></article>
         <article class="stat"><span>عدد أرباع الوِرد</span><strong id="dailyAmountSummary">2</strong><small>ربع</small></article>
         <article class="stat"><span>أيام القراءة</span><strong id="activeDaysCount">7</strong><small>أسبوعيًا</small></article>
       </div>
       <div class="stats-grid detail-stats"><article class="stat"><span>تمت قراءته</span><strong id="doneCount">0</strong><small>ربع</small></article><article class="stat"><span>المتبقي</span><strong id="remainingCount">2</strong><small>ربع</small></article><article class="stat"><span>إجمالي الوِرد</span><strong id="detailTotal">2</strong><small>ربع</small></article><article class="stat schedule-stat"><span>مقارنة بالخطة</span><strong id="scheduleDelta">في الموعد</strong><small id="scheduleDeltaDetail">لا تأخير</small></article></div>
-      <button class="primary-btn" id="startReadingBtn">ابدأ الوِرد</button>
-      <button class="secondary-btn" id="completeWirdDayBtn">تمت قراءة وِرد اليوم والانتقال للوِرد التالي</button>
     </section>
 
     <div class="modal-backdrop hidden" id="reminderModal"><div class="mini-modal"><h2>موعد تذكير الوِرد</h2><input type="time" id="quickReminderTime" /><div class="modal-actions"><button class="text-btn" id="cancelReminderBtn">إلغاء</button><button class="primary-btn" id="saveReminderBtn">حفظ</button></div></div></div>
@@ -255,8 +254,9 @@
   </main>
 
   <script src="assets/quran/quran-data.js"></script>
-  <script src="assets/adhkar-data.js?v=26"></script>
-  <script src="app-v20.js?v=26"></script>
-  <script src="release-fixes.js?v=26"></script>
+  <script type="module">if(window.Capacitor?.isNativePlatform?.())import("./native-notifications.js");</script>
+  <script src="assets/adhkar-data.js?v=30"></script>
+  <script src="app-v20.js?v=30"></script>
+  <script src="release-fixes.js?v=30"></script>
 </body>
 </html>

@@ -356,6 +356,7 @@ html[dir="ltr"] .back-btn{transform:scaleX(-1)}
 .theme-toggle-btn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.theme-toggle-btn:hover{background:var(--surface-2)}
 .donation-card{margin-top:18px;padding:20px 18px;background:var(--surface);border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow);text-align:start}.donation-greeting{margin:0 0 10px;font-weight:800}.donation-copy{margin:0;color:var(--muted);font-size:13px;line-height:1.8}.donation-options{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:18px}.donation-options button{min-width:0;min-height:38px;padding:7px 5px;border:1px solid var(--border);border-radius:999px;background:var(--surface-2);color:var(--text);font-size:12px;font-weight:800;cursor:default}.donation-options button:last-child{font-size:11px}@media(max-width:360px){.donation-options{grid-template-columns:repeat(2,1fr)}}
 .source-links{display:flex;gap:10px;margin-top:14px}.source-links a{flex:1;padding:9px 12px;border:1px solid var(--border);border-radius:999px;background:var(--surface-2);color:var(--primary-strong);text-align:center;font-weight:800;text-decoration:none}
+.release-v2-feature{display:none!important}.legal-links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:18px}.legal-links a{padding:12px;border:1px solid var(--border);border-radius:16px;background:var(--surface);color:var(--primary-strong);text-align:center;font-weight:800;text-decoration:none;box-shadow:var(--shadow)}.location-disclosure{margin:0 0 12px;color:var(--muted);font-size:12px;line-height:1.65;text-align:center}
 .app-dialog-card{text-align:center;border:2px solid var(--border);background:var(--surface);padding:24px 22px}.app-dialog-icon{width:48px;height:48px;margin:0 auto 12px;border:2px solid var(--primary);border-radius:50%;display:grid;place-items:center;background:var(--surface-2);color:var(--primary-strong);font-size:22px;font-weight:900}.app-dialog-card h2{margin:0 0 9px;font-size:21px}.app-dialog-card p{margin:0;color:var(--muted);font-size:15px;line-height:1.7}.app-dialog-actions{margin-top:18px}.app-dialog-actions .text-btn,.app-dialog-actions .primary-btn{width:100%;min-height:44px;margin:0;border-radius:14px;font-weight:800}.app-dialog-actions .text-btn{border:1px solid var(--border);background:var(--surface-2);color:var(--text)}.app-dialog-actions .dialog-danger{background:#9b5047;color:#fff}.app-dialog-actions:has(.text-btn.hidden){grid-template-columns:1fr}.app-dialog-actions:has(.text-btn.hidden) .primary-btn{grid-column:1/-1}
 #saveSettingsBtn{transition:background-color .2s,color .2s,border-color .2s,opacity .2s}#saveSettingsBtn.saved,#saveSettingsBtn.saved:disabled{background:var(--surface-2);border:1px solid var(--border);color:var(--muted);opacity:1;cursor:default;box-shadow:none}
 
@@ -504,3 +505,87 @@ body::before{content:"";position:fixed;z-index:19;top:0;left:0;right:0;height:va
 .kahf-notification-setting>input[type="time"],.options-modal>input[type="time"]{position:static!important;display:block!important;width:100%!important;max-width:100%!important;margin-inline:0!important;transform:none!important;direction:ltr!important;text-align:center!important;text-align-last:center!important}
 .options-modal>label,.options-modal>.time-preview{width:100%;text-align:center!important}
 .options-modal .two-fields>div,.options-modal .two-fields label,.options-modal .two-fields input{text-align:center!important;text-align-last:center!important}
+
+/* iOS uses intrinsic widths for native time controls. The shell owns the
+   geometry so Arabic/LTR direction changes cannot move or enlarge the field. */
+.time-field-shell{
+  position:relative;
+  display:grid;
+  place-items:center;
+  inline-size:100%;
+  min-inline-size:0;
+  max-inline-size:100%;
+  block-size:54px;
+  margin:0 auto;
+  overflow:hidden;
+  border:1px solid var(--border);
+  border-radius:14px;
+  background:var(--surface);
+  outline:1px solid var(--border);
+}
+.time-field-value{
+  position:absolute;
+  inset:0;
+  z-index:1;
+  display:grid;
+  place-items:center;
+  inline-size:100%;
+  block-size:100%;
+  padding:0 14px;
+  color:var(--text);
+  direction:ltr;
+  text-align:center;
+  pointer-events:none;
+}
+.time-field-shell>input[type="time"]{
+  position:absolute!important;
+  inset:0!important;
+  z-index:2;
+  display:block!important;
+  inline-size:100%!important;
+  min-inline-size:0!important;
+  max-inline-size:100%!important;
+  block-size:100%!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  outline:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  transform:none!important;
+  opacity:0!important;
+  cursor:pointer;
+}
+.options-modal>.time-field-shell,
+.kahf-notification-setting>.time-field-shell{
+  inline-size:100%!important;
+  min-inline-size:0!important;
+  max-inline-size:100%!important;
+  align-self:stretch!important;
+}
+
+/* Version-one feature gates: keep unfinished controls in source without shipping dead UI. */
+.release-v1 .prayer-row{grid-template-columns:1fr 1fr}
+.release-v1 .prayer-alert{display:none}
+
+/* Release 1.1 navigation, history and calendar controls. */
+.topbar{direction:ltr}
+.settings-header-btn{order:-1}.settings-header-btn svg{width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}#menuBtn{order:1}.theme-brand-btn{order:0}
+.khatma-action-strip{position:relative;display:block;margin:12px 22px}
+.khatma-action-strip .khatma-action-btn{width:100%;padding-inline:58px}
+.khatma-action-strip .khatma-share-btn{position:absolute;z-index:2;top:50%;right:9px;transform:translateY(-50%);width:44px;height:44px;border-color:color-mix(in srgb,#fff 42%,var(--border));background:color-mix(in srgb,#fff 13%,transparent);color:#fff}
+.khatma-action-strip .khatma-share-btn,.khatma-action-strip .khatma-share-btn:disabled{opacity:1!important;filter:none!important;pointer-events:auto!important;cursor:pointer;background:var(--primary-strong)!important;color:#fff!important;border-color:color-mix(in srgb,#fff 55%,var(--border))!important;box-shadow:0 2px 7px color-mix(in srgb,var(--primary-strong) 18%,transparent)}
+html[dir="ltr"] .khatma-action-strip .khatma-share-btn{right:auto;left:9px}
+.khatma-action-btn:disabled{opacity:.5;cursor:default;filter:saturate(.55)}
+.timeline-toggle{width:100%;display:grid;grid-template-columns:1fr auto 24px;gap:8px;align-items:center;padding:14px 16px;border:0;border-bottom:1px solid var(--border);background:transparent;color:var(--text);text-align:start}
+.timeline-toggle span{color:var(--muted);font-size:12px}.timeline-toggle strong{font-size:17px}.timeline-toggle b{font-size:20px;transition:transform .2s}.timeline-toggle.expanded b{transform:rotate(180deg)}
+.timeline-row.history-hidden{display:none}
+.khatma-origin-fields{margin-top:18px}.khatma-origin-fields input{text-align:center!important;text-align-last:center!important}.khatma-origin-fields input[readonly]{opacity:.62}
+#khatmaSchedulePreview{display:block;line-height:1.6;text-align:center;margin:9px 0 4px}
+.release-v1 .prayer-row{grid-template-columns:1fr 48px 1fr}.release-v1 .prayer-alert{display:grid}
+body:not(.mushaf-mode) .topbar{position:sticky;top:0;z-index:30}
+
+/* App copy behaves like native interface text; editable controls remain selectable. */
+body{-webkit-user-select:none;user-select:none}
+input,textarea,[contenteditable="true"]{-webkit-user-select:text;user-select:text}
