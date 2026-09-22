@@ -1,7 +1,7 @@
 
-const CACHE='werdy-web-v72';
+const CACHE='werdy-web-v73';
 const appAsset=path=>new URL(path,self.registration.scope).href;
-const CORE=['./?release=72','./index.html','./app-v20.js?v=72','./release-fixes.js?v=72','./manifest.json?v=72','./privacy.html','./support.html','./legal.css','./assets/adhkar-data.js?v=72','./assets/quran/quran-data.js','./icons/icon-192.png','./icons/icon-512.png'].map(appAsset);
+const CORE=['./?release=73','./index.html','./app-v20.js?v=73','./release-fixes.js?v=73','./manifest.json?v=73','./privacy.html','./support.html','./legal.css','./assets/adhkar-data.js?v=73','./assets/quran/quran-data.js','./icons/icon-192.png','./icons/icon-512.png'].map(appAsset);
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',event=>{
