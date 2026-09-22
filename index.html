@@ -1,17 +1,19 @@
 <!doctype html>
-<html lang="ar" dir="rtl" data-build="30">
+<html lang="ar" dir="rtl" data-build="72">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" id="themeColorMeta" content="#ded4c5" />
+  <meta name="theme-color" id="themeColorMeta" content="#eff5dc" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" id="appleStatusBarMeta" content="default" />
   <meta name="apple-mobile-web-app-title" content="Werdy" />
   <title>وِردي | Werdy</title>
-  <meta name="werdy-build" content="30" />
-  <link rel="manifest" href="manifest.json?v=30" />
-  <link rel="apple-touch-icon" href="icons/icon-192.png" />
-  <link rel="stylesheet" href="styles-v20.css?v=30" />
+  <meta name="werdy-build" content="72" />
+  <script>if(!localStorage.getItem('werdy_khatmas'))sessionStorage.setItem('werdy_native_restore_needed','1')</script>
+  <link rel="manifest" href="./manifest.json?v=72" />
+  <link rel="apple-touch-icon" href="./assets/icon-192-1xGgNftV.png" />
+  <script type="module" crossorigin src="./assets/index-Byuzri1H.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-BO7FJPfd.css">
 </head>
 <body class="release-v1">
   
@@ -38,7 +40,7 @@
         </div>
       </div>
 
-      <div class="onboarding-section"><label id="onboardingLocationLabel">الموقع لمواقيت الصلاة</label><p class="location-disclosure" id="onboardingLocationDisclosure">يُستخدم موقعك عند طلبك فقط ويُرسل إلى خدمة AlAdhan لحساب المواقيت. لا تحتفظ وِردي بالموقع على خوادمها.</p><button class="choice-btn location-onboarding-btn" id="onboardingLocationBtn">تحديد موقعي الحالي</button><small class="muted onboarding-location-status" id="onboardingLocationStatus">يمكنك تغييره لاحقًا من شاشة الصلاة.</small></div>
+      <div class="onboarding-section"><label id="onboardingLocationLabel">الموقع لمواقيت الصلاة</label><p class="location-disclosure" id="onboardingLocationDisclosure">يُستخدم موقعك عند طلبك فقط؛ تُستخدم OpenStreetMap أو BigDataCloud لعرض المدينة والدولة، وAlAdhan لحساب المواقيت. لا تحتفظ وِردي بالموقع على خوادمها.</p><button class="choice-btn location-onboarding-btn" id="onboardingLocationBtn">تحديد موقعي الحالي</button><small class="muted onboarding-location-status" id="onboardingLocationStatus">يمكنك تغييره لاحقًا من شاشة الصلاة.</small></div>
 
       <button class="primary-btn" id="continueOnboarding">متابعة</button>
     </div>
@@ -52,10 +54,12 @@
       <button class="brand theme-brand-btn" id="themeBrandBtn" type="button" aria-label="تغيير المظهر"><span class="brand-ar">وِردي</span><span class="brand-en">Werdy</span></button>
       <button class="icon-btn settings-header-btn" id="settingsHeaderBtn" aria-label="الإعدادات"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10M14 4v6M7 14v6"/><circle cx="14" cy="7" r="2"/><circle cx="7" cy="17" r="2"/></svg></button>
     </header>
-    <div class="global-quran-search hidden" id="globalQuranSearch">
-      <select id="globalSurahSelect" aria-label="السورة"></select>
-      <input id="globalAyahInput" type="text" inputmode="numeric" pattern="[0-9٠-٩۰-۹]*" value="1" aria-label="رقم الآية" />
-      <button class="small-btn" id="globalQuranGoBtn">انتقال</button>
+    <div class="global-quran-search-backdrop hidden" id="globalQuranSearch">
+      <div class="global-quran-search" role="dialog" aria-modal="true" aria-label="الذهاب إلى آية">
+        <select id="globalSurahSelect" aria-label="السورة"></select>
+        <input id="globalAyahInput" type="text" inputmode="numeric" pattern="[0-9٠-٩۰-۹]*" value="1" aria-label="رقم الآية" />
+        <button class="small-btn" id="globalQuranGoBtn">اذهب</button>
+      </div>
     </div>
 
     <section class="screen" id="adhkarScreen">
@@ -71,6 +75,7 @@
     <section class="screen" id="homeScreen">
       <div class="page-title-card"><h1>الأوراد</h1><p class="muted" id="todayLabel"></p><span class="count-badge hidden" id="awradCount">1</span></div>
       <div id="awradCards" class="awrad-cards"></div>
+      <button class="add-werd-card-btn" id="addWerdFromHomeBtn" type="button"><span aria-hidden="true">＋</span><b>إضافة وِرد</b></button>
     </section>
 
     <section class="screen" id="wirdDetailsScreen">
@@ -89,7 +94,7 @@
     </section>
 
     <div class="modal-backdrop hidden" id="reminderModal"><div class="mini-modal"><h2>موعد تذكير الوِرد</h2><input type="time" id="quickReminderTime" /><div class="modal-actions"><button class="text-btn" id="cancelReminderBtn">إلغاء</button><button class="primary-btn" id="saveReminderBtn">حفظ</button></div></div></div>
-    <div class="modal-backdrop hidden" id="khatmaOptionsModal"><div class="mini-modal options-modal"><h2 id="khatmaOptionsTitle">إعدادات الختمة</h2><label id="khatmaEditableNameLabel">اسم الختمة</label><input class="centered-field" type="text" id="khatmaEditableName" maxlength="60"/><label>وقت التذكير اليومي</label><div class="time-field-shell"><span class="time-field-value" id="khatmaReminderTimeDisplay" aria-hidden="true">09:00 AM</span><input type="time" id="khatmaReminderTime"/></div><small class="time-preview" id="khatmaReminderPreview"></small><div class="khatma-origin-fields"><label id="khatmaStartDateInputLabel">تاريخ بداية الختمة</label><div class="date-field-shell"><span class="date-field-value" id="khatmaStartDateDisplay" aria-hidden="true"></span><input type="date" id="khatmaStartDateInput"/></div></div><small class="time-preview" id="khatmaSchedulePreview"></small><label>أيام الوِرد</label><div class="days-grid" id="khatmaDaysGrid"></div><label>مقدار الوِرد اليومي</label><div class="two-fields"><div><label>الأجزاء</label><input type="text" inputmode="numeric" pattern="[0-9٠-٩۰-۹]*" id="khatmaParts"/></div><div><label>الأرباع</label><input type="text" inputmode="numeric" pattern="[0-9٠-٩۰-۹]*" id="khatmaQuarters"/></div></div><small class="validation-message" id="khatmaAmountError"></small><div class="modal-actions"><button class="text-btn" id="cancelKhatmaOptionsBtn">إلغاء</button><button class="primary-btn" id="saveKhatmaOptionsBtn">حفظ</button></div></div></div>
+    <div class="modal-backdrop hidden" id="khatmaOptionsModal"><div class="mini-modal options-modal"><h2 id="khatmaOptionsTitle">إعدادات الختمة</h2><label id="khatmaEditableNameLabel">اسم الختمة</label><input class="centered-field" type="text" id="khatmaEditableName" maxlength="60"/><label>وقت التذكير اليومي</label><div class="time-field-shell"><span class="time-field-value" id="khatmaReminderTimeDisplay" aria-hidden="true">09:00 AM</span><input type="time" id="khatmaReminderTime"/></div><small class="time-preview" id="khatmaReminderPreview"></small><div class="khatma-origin-fields"><label id="khatmaStartDateInputLabel">تاريخ بداية الختمة</label><div class="date-field-shell"><span class="date-field-value" id="khatmaStartDateDisplay" aria-hidden="true"></span><input type="date" id="khatmaStartDateInput"/></div></div><small class="time-preview" id="khatmaSchedulePreview"></small><label>أيام الوِرد</label><div class="days-grid" id="khatmaDaysGrid"></div><label>مقدار الوِرد اليومي</label><div class="two-fields"><div><label>الأجزاء</label><input type="text" inputmode="numeric" pattern="[0-9٠-٩۰-۹]*" id="khatmaParts"/></div><div><label>الأرباع</label><input type="text" inputmode="numeric" pattern="[0-9٠-٩۰-۹]*" id="khatmaQuarters"/></div></div><small class="validation-message" id="khatmaAmountError"></small><div class="modal-actions"><button class="text-btn" id="cancelKhatmaOptionsBtn">إلغاء</button><button class="primary-btn" id="saveKhatmaOptionsBtn">حفظ</button></div><button class="delete-khatma-options-btn" id="deleteKhatmaFromOptionsBtn" type="button">حذف الختمة</button></div></div>
     <div class="modal-backdrop hidden" id="appDialog" role="dialog" aria-modal="true" aria-labelledby="appDialogTitle" aria-describedby="appDialogMessage"><div class="mini-modal app-dialog-card"><div class="app-dialog-icon" id="appDialogIcon">!</div><h2 id="appDialogTitle"></h2><p id="appDialogMessage"></p><div class="modal-actions app-dialog-actions"><button class="text-btn" id="appDialogCancel"></button><button class="primary-btn" id="appDialogConfirm"></button></div></div></div>
 
     <section class="screen" id="readingScreen">
@@ -135,15 +140,19 @@
 
     <section class="screen active" id="khatmaScreen">
       <div class="page-title-card selector-title-card"><select id="khatmaSelector" aria-label="اختر الختمة"></select></div>
-      <article class="hero-card khatma-summary">
+      <div class="khatma-carousel-viewport" id="khatmaCarouselViewport"><article class="hero-card khatma-summary" id="khatmaSummaryCard">
+        <svg class="khatma-summary-shape" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="M5 .6 H95 Q99.4 .6 99.4 5 V38 C99.4 42 96.5 44 96.5 50 C96.5 56 99.4 58 99.4 62 V95 Q99.4 99.4 95 99.4 H5 Q.6 99.4 .6 95 V62 C.6 58 3.5 56 3.5 50 C3.5 44 .6 42 .6 38 V5 Q.6 .6 5 .6 Z"/></svg>
+        <button class="khatma-day-arrow khatma-day-arrow-previous" id="homePreviousWirdBtn" type="button" aria-label="اليوم السابق"></button>
+        <button class="khatma-day-arrow khatma-day-arrow-next" id="homeNextWirdBtn" type="button" aria-label="اليوم التالي"></button>
         <div class="ring" id="khatmaRing"><strong id="khatmaPercent">0%</strong></div>
         <p class="khatma-today-text" id="khatmaTodayText"></p>
         <div class="khatma-date-row"><p><span id="khatmaStartDateLabel">تاريخ البدء</span><strong id="khatmaStartDate"></strong></p><p><span id="khatmaExpectedDateLabel">الانتهاء المتوقع</span><strong id="khatmaExpectedDate"></strong></p></div>
         <p class="khatma-schedule-status" id="khatmaScheduleStatus"></p>
         <p class="khatma-rest-note hidden" id="khatmaRestNote"></p>
         <p class="muted khatma-completion-date hidden" id="khatmaCompletionDate"></p>
-        <p class="muted khatma-stage-line" id="khatmaStageLine"></p>
-      </article>
+        <button class="khatma-position-toggle" id="khatmaPositionToggle" type="button" aria-expanded="false" aria-controls="khatmaStageLine"><span id="khatmaPositionToggleLabel">المرحلة الحالية</span><b aria-hidden="true">⌄</b></button>
+        <p class="muted khatma-stage-line hidden" id="khatmaStageLine"></p>
+      </article></div>
       <div class="khatma-action-strip">
         <button class="khatma-action-btn" id="khatmaStartCard">ابدأ وِرد اليوم</button>
         <button class="khatma-share-btn" id="khatmaShareBtn" aria-label="مشاركة وِرد اليوم"></button>
@@ -162,14 +171,12 @@
         <div class="prayer-field"><label for="prayerMethod">جهة حساب المواقيت</label><select id="prayerMethod"><option value="4">جامعة أم القرى — مكة</option><option value="3">Muslim World League (MWL) — رابطة العالم الإسلامي</option><option value="5">الهيئة المصرية العامة للمساحة</option><option value="2">الجمعية الإسلامية لأمريكا الشمالية</option><option value="1">جامعة العلوم الإسلامية — كراتشي</option><option value="13">رئاسة الشؤون الدينية التركية</option></select></div>
         <div class="prayer-location-grid"><div class="prayer-field"><label for="prayerCity">المدينة</label><input id="prayerCity" value="Belfast" readonly/></div><div class="prayer-field"><label for="prayerCountry">الدولة</label><input id="prayerCountry" value="GB" readonly/></div></div>
         <button class="small-btn location-btn" id="useCurrentLocationBtn">⌖ استخدم موقعي الحالي</button>
-        <small class="location-status muted" id="prayerLocationStatus">الموقع الحالي: Belfast، GB</small><small class="source-note" id="prayerLocationDisclosure">يُرسل الموقع إلى خدمة AlAdhan لحساب المواقيت عند اختيارك استخدام الموقع، ولا تحتفظ به وِردي على خوادمها.</small><small class="source-note">تتحدث المواقيت تلقائيًا، وقد تختلف عن توقيت مسجدك المحلي.</small>
+        <small class="location-status muted" id="prayerLocationStatus">الموقع الحالي: Belfast، GB</small><small class="source-note" id="prayerLocationDisclosure">عند استخدام موقعك، تُستخدم OpenStreetMap أو BigDataCloud لعرض المدينة والدولة، وAlAdhan لحساب المواقيت. لا تحتفظ وِردي بالموقع على خوادمها.</small><small class="source-note">تتحدث المواقيت تلقائيًا، وقد تختلف عن توقيت مسجدك المحلي.</small>
       </article>
     </section>
 
     <section class="screen" id="settingsScreen">
       <div class="page-title-card"><h1>الإعدادات</h1></div>
-
-      <div class="settings-group"><label>الختمات والأوراد</label><div class="inline-add"><input id="khatmaNameInput" maxlength="40" placeholder="اسم الختمة الجديدة"/><button class="small-btn" id="addKhatmaBtn">إضافة</button></div><div id="settingsKhatmasList" class="settings-khatmas"></div></div>
 
       <div class="settings-group">
         <label>حجم خط القرآن</label>
@@ -248,7 +255,7 @@
     </section>
 
     <nav class="bottom-nav">
-      <button class="nav-item" data-target="adhkarScreen" aria-label="الأذكار"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.5 7.5c1.8-2.7 5.4-4 8.8-2.7 3.9 1.5 5.8 6 4.1 9.8-1.5 3.4-5.2 5.2-8.8 4.3"/><circle cx="6" cy="10" r="1.7"/><circle cx="6" cy="15" r="1.7"/><circle cx="8.5" cy="19" r="1.7"/><path d="M9.8 20.2 12 22"/></svg><span>الأذكار</span></button>
+      <button class="nav-item" data-target="adhkarScreen" aria-label="الأذكار"><svg class="tasbih-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16.8 17.2c-2.2 1.7-5.4 1.9-7.9.4-2.5-1.4-4-4.2-3.7-7 .3-2.9 2.4-5.4 5.1-6.2 2.8-.8 5.9.2 7.6 2.6 1.8 2.4 1.9 5.7.3 8.2"/><circle cx="7" cy="6.9" r="1.05"/><circle cx="5.3" cy="10" r="1.05"/><circle cx="5.8" cy="13.5" r="1.05"/><circle cx="8.2" cy="16.2" r="1.05"/><circle cx="11.5" cy="17.5" r="1.05"/><circle cx="14.9" cy="16.7" r="1.05"/><circle cx="17.5" cy="14.3" r="1.05"/><circle cx="18.4" cy="10.9" r="1.05"/><circle cx="17.2" cy="7.6" r="1.05"/><circle cx="14.4" cy="5.5" r="1.05"/><circle cx="10.9" cy="5" r="1.05"/><path d="M16.1 17.4c.2 1.4.8 2.2 1.9 2.8M18 20.2l-1 2M18 20.2l1.6 1.5"/></svg><span>الأذكار</span></button>
       <button class="nav-item" data-target="groupScreen" aria-label="الصلاة"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v4.5l3 1.8M18.5 4.5l1 1"/></svg><span>الصلاة</span></button>
       <button class="nav-item active" data-target="khatmaScreen" aria-label="الرئيسية"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="m8.5 12 2.2 2.2 4.8-5"/></svg><span>الرئيسية</span></button>
       <button class="nav-item" data-target="homeScreen" aria-label="الأوراد"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5M5.5 10v9h13v-9M9.5 19v-5h5v5"/></svg><span>الأوراد</span></button>
@@ -257,9 +264,8 @@
   </main>
 
   <script src="assets/quran/quran-data.js"></script>
-  <script type="module">if(window.Capacitor?.isNativePlatform?.())import("./native-notifications.js");</script>
-  <script src="assets/adhkar-data.js?v=30"></script>
-  <script src="app-v20.js?v=30"></script>
-  <script src="release-fixes.js?v=30"></script>
+  <script src="assets/adhkar-data.js?v=72"></script>
+  <script src="app-v20.js?v=72"></script>
+  <script src="release-fixes.js?v=72"></script>
 </body>
 </html>
