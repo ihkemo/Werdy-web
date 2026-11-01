@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ar" dir="rtl" data-build="73">
+<html lang="ar" dir="rtl" data-build="75">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
@@ -8,12 +8,12 @@
   <meta name="apple-mobile-web-app-status-bar-style" id="appleStatusBarMeta" content="default" />
   <meta name="apple-mobile-web-app-title" content="Werdy" />
   <title>وِردي | Werdy</title>
-  <meta name="werdy-build" content="73" />
+  <meta name="werdy-build" content="75" />
   <script>if(!localStorage.getItem('werdy_khatmas'))sessionStorage.setItem('werdy_native_restore_needed','1')</script>
-  <link rel="manifest" href="./manifest.json?v=73" />
+  <link rel="manifest" href="./manifest.json?v=75" />
   <link rel="apple-touch-icon" href="./assets/icon-192-Cp0C3r31.png" />
-  <script type="module" crossorigin src="./assets/index-Byuzri1H.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-BO7FJPfd.css">
+  <script type="module" crossorigin src="./assets/index-BpGEDRDL.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-DXJ18Jr6.css">
 </head>
 <body class="release-v1">
   
@@ -144,13 +144,12 @@
         <svg class="khatma-summary-shape" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="M5 .6 H95 Q99.4 .6 99.4 5 V38 C99.4 42 96.5 44 96.5 50 C96.5 56 99.4 58 99.4 62 V95 Q99.4 99.4 95 99.4 H5 Q.6 99.4 .6 95 V62 C.6 58 3.5 56 3.5 50 C3.5 44 .6 42 .6 38 V5 Q.6 .6 5 .6 Z"/></svg>
         <button class="khatma-day-arrow khatma-day-arrow-previous" id="homePreviousWirdBtn" type="button" aria-label="اليوم السابق"></button>
         <button class="khatma-day-arrow khatma-day-arrow-next" id="homeNextWirdBtn" type="button" aria-label="اليوم التالي"></button>
-        <div class="ring" id="khatmaRing"><strong id="khatmaPercent">0%</strong></div>
-        <p class="khatma-today-text" id="khatmaTodayText"></p>
+        <div class="ring khatma-progress-ring" id="khatmaRing"><div class="ring-copy"><strong class="khatma-percent" id="khatmaPercent">0%</strong><span id="khatmaWeekday" class="khatma-weekday"></span></div></div>
+        <button type="button" class="khatma-today-text" id="khatmaTodayText" aria-haspopup="dialog"></button>
         <div class="khatma-date-row"><p><span id="khatmaStartDateLabel">تاريخ البدء</span><strong id="khatmaStartDate"></strong></p><p><span id="khatmaExpectedDateLabel">الانتهاء المتوقع</span><strong id="khatmaExpectedDate"></strong></p></div>
-        <p class="khatma-schedule-status" id="khatmaScheduleStatus"></p>
+        <div class="khatma-schedule-row"><p class="khatma-schedule-status" id="khatmaScheduleStatus"></p><button class="khatma-position-toggle" id="khatmaPositionToggle" type="button" aria-expanded="false" aria-haspopup="dialog" aria-controls="khatmaInfoModal" aria-label="تفاصيل المرحلة الحالية"><span aria-hidden="true">!</span><span class="visually-hidden" id="khatmaPositionToggleLabel">المرحلة الحالية</span></button></div>
         <p class="khatma-rest-note hidden" id="khatmaRestNote"></p>
         <p class="muted khatma-completion-date hidden" id="khatmaCompletionDate"></p>
-        <button class="khatma-position-toggle" id="khatmaPositionToggle" type="button" aria-expanded="false" aria-controls="khatmaStageLine"><span id="khatmaPositionToggleLabel">المرحلة الحالية</span><b aria-hidden="true">⌄</b></button>
         <p class="muted khatma-stage-line hidden" id="khatmaStageLine"></p>
       </article></div>
       <div class="khatma-action-strip">
@@ -197,6 +196,15 @@
         <label class="kahf-time-label" for="kahfNotificationTime" id="kahfTimeLabel">وقت التنبيه</label>
         <div class="time-field-shell"><span class="time-field-value" id="kahfNotificationTimeDisplay" aria-hidden="true">10:00 AM</span><input type="time" id="kahfNotificationTime" value="10:00" /></div>
         <small class="time-preview" id="kahfTimePreview"></small>
+      </div>
+
+      <div class="settings-group salawat-setting">
+        <div class="notification-setting">
+          <div><label id="salawatReminderLabel">تذكير بالصلاة على النبي محمد صلى الله عليه وسلم ليلة الجمعة</label><small class="muted" id="salawatReminderStatus">متوقفة</small></div>
+          <button class="small-btn" id="salawatToggle" type="button" aria-pressed="false">تفعيل</button>
+        </div>
+        <p class="salawat-reminder-time" id="salawatReminderTime">كل يوم خميس · الساعة ٤ عصرًا · حسب توقيت الموبايل</p>
+        <button class="text-btn salawat-preview" id="salawatPreview" type="button" aria-haspopup="dialog">عرض صيغة الصلاة على النبي ومشاركتها</button>
       </div>
 
       <div class="settings-group"><label>نظام عرض الوقت</label><select id="timeFormatSelect"><option value="12">12 ساعة — AM / PM</option><option value="24">24 ساعة</option></select><small class="muted setting-hint">يُطبّق على كل الأوقات المعروضة في البرنامج.</small></div>
@@ -263,9 +271,20 @@
     </nav>
   </main>
 
+  <div class="modal-backdrop hidden" id="khatmaInfoModal"><section class="mini-modal khatma-info-modal" role="dialog" aria-modal="true" aria-labelledby="khatmaInfoTitle" tabindex="-1"><button type="button" class="info-close" id="khatmaInfoClose" aria-label="إغلاق">×</button><h2 id="khatmaInfoTitle"></h2><p id="khatmaInfoBody"></p></section></div>
+  <div class="modal-backdrop hidden" id="salawatModal">
+    <section class="mini-modal salawat-modal" role="dialog" aria-modal="true" aria-labelledby="salawatTitle">
+      <button type="button" class="info-close" id="salawatClose" aria-label="إغلاق">×</button>
+      <h2 id="salawatTitle">الصلاة على النبي محمد صلى الله عليه وسلم</h2>
+      <textarea id="salawatText" class="salawat-prayer-text" dir="rtl" lang="ar" readonly aria-label="صيغة الصلاة على النبي"></textarea>
+      <div class="salawat-actions"><button type="button" class="primary-btn" id="salawatShare">مشاركة</button><button type="button" class="text-btn" id="salawatCopy">نسخ النص</button></div>
+      <p class="muted salawat-facebook-hint" id="salawatFacebookHint"></p>
+      <p class="salawat-share-status" id="salawatShareStatus" role="status" aria-live="polite"></p>
+    </section>
+  </div>
   <script src="assets/quran/quran-data.js"></script>
-  <script src="assets/adhkar-data.js?v=73"></script>
-  <script src="app-v20.js?v=73"></script>
-  <script src="release-fixes.js?v=73"></script>
+  <script src="assets/adhkar-data.js?v=75"></script>
+  <script src="app-v20.js?v=75"></script>
+  <script src="release-fixes.js?v=75"></script>
 </body>
 </html>

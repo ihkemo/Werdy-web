@@ -76,10 +76,19 @@ $('addWerdFromHomeBtn').onclick=()=>{const base=L('وِرد جديد','New Werd'
 $('deleteKhatmaFromOptionsBtn').onclick=async()=>{const k=selected();if(state.khatmas.length===1){await appDialog({title:L('لا يمكن حذف الختمة','Khatma Cannot Be Deleted'),message:L('لابد من وجود ختمة واحدة على الأقل في البرنامج.','The App Must Contain At Least One Khatma.')});return}const approved=await appDialog({title:L('تأكيد الحذف','Confirm Deletion'),message:L(`هل تريد حذف «${k.name}» نهائيًا؟`,`Permanently Delete “${k.name}”?`),confirmText:L('حذف','Delete'),showCancel:true,danger:true});if(!approved)return;state.khatmas=state.khatmas.filter(item=>item.id!==k.id);const fallback=state.khatmas.find(item=>item.id===settingsReturnKhatmaId)||state.khatmas[0];settingsReturnKhatmaId=null;state.selectedId=fallback.id;viewedWerdDate=null;state.dayIndex=displayedWerdIndex(fallback);editingNewKhatma=false;$('khatmaOptionsModal').classList.add('hidden');persist();renderState()};
 $('saveKhatmaOptionsBtn').onclick=async()=>{
   const k=selected(),locked=!editingNewKhatma&&hasStartedReading(k);
+  if(!locked){const {p,q}=normalizeOptions('save');if(p*8+q===0)return;if(!k.days.length){await appDialog({message:L('اختر يوم قراءة واحدًا على الأقل.','Choose At Least One Reading Day.')});return}}
   if(!locked){const {p,q}=normalizeOptions('save');k.parts=p;k.quarters=q;k.startDate=$('khatmaStartDateInput').value||dateKey()}
   state.dayIndex=displayedWerdIndex(k);
   await saveOptionsCalendarCore();
-  if($('khatmaOptionsModal').classList.contains('hidden')){editingKhatmaSnapshot=null;editingNewKhatmaId=null;editingReturnSelectedId=null}
+  if($('khatmaOptionsModal').classList.contains('hidden')){
+    editingKhatmaSnapshot=null;editingNewKhatmaId=null;editingReturnSelectedId=null;
+    const today=normalizedWerdDate(new Date()),pastCount=pastScheduledWerdCount(k,today);
+    if(!locked&&pastCount>0){
+      const markPast=await appDialog({title:L('الأوراد السابقة','Earlier Werds'),message:L(`تاريخ بداية الختمة قبل اليوم. هل تريد تحديد الأوراد السابقة لليوم (${pastCount} وِرد) كمقروءة؟ وِرد اليوم سيبقى متاحًا للقراءة.`,`This Khatma Starts Before Today. Mark The ${pastCount} Earlier Werds As Read? Today’s Werd Will Remain Available.`),confirmText:L('تحديد السابقة كمقروءة','Mark Earlier Werds As Read'),cancelText:L('تركها للقراءة','Leave Them Unread'),showCancel:true});
+      if(markPast){for(let index=0;index<pastCount;index++)setReading(k,index,amount(k));reconcileKhatmaReadings(k);if(k.total>=240&&!k.completionDate)k.completionDate=dateKey();}
+      persist();renderState();
+    }
+  }
   if(settingsReturnKhatmaId!==null&&$('khatmaOptionsModal').classList.contains('hidden')){state.selectedId=settingsReturnKhatmaId;settingsReturnKhatmaId=null;state.dayIndex=displayedWerdIndex(selected());persist();renderState()}
 };
 const cancelOptionsStableCore=$('cancelKhatmaOptionsBtn').onclick;
@@ -106,15 +115,15 @@ renderTimeline=()=>{
 $('timelineToggle').onclick=()=>{timelineExpanded=!timelineExpanded;renderTimeline()};
 function updateKhatmaPositionDisclosure(){
   $('khatmaPositionToggle').setAttribute('aria-expanded',String(khatmaPositionExpanded));
-  $('khatmaStageLine').classList.toggle('hidden',!khatmaPositionExpanded);
+  $('khatmaStageLine').classList.add('hidden');
 }
-function collapseKhatmaPosition(){if(!khatmaPositionExpanded)return;khatmaPositionExpanded=false;updateKhatmaPositionDisclosure();carouselPeerCache.clear();carouselPeerCacheKey=''}
-$('khatmaPositionToggle').onclick=event=>{event.stopPropagation();khatmaPositionExpanded=!khatmaPositionExpanded;updateKhatmaPositionDisclosure();carouselPeerCache.clear();carouselPeerCacheKey='';scheduleCarouselPeerCache()};
+function collapseKhatmaPosition(){khatmaPositionExpanded=false;updateKhatmaPositionDisclosure()}
+$('khatmaPositionToggle').onclick=event=>{event.stopPropagation();khatmaPositionExpanded=true;updateKhatmaPositionDisclosure();openKhatmaInfo($('khatmaPositionToggleLabel').textContent,$('khatmaStageLine').textContent)};
 
 const renderStateReleaseCore=renderState;
 renderState=()=>{
   if(document.querySelector('.screen.active')?.id==='khatmaScreen')syncViewedWerdIndex();
-  const k=selected();reconcileKhatmaReadings(k);renderStateReleaseCore();const a=amount(k),done=reading(k,state.dayIndex),viewDate=activeViewedWerdDate(),today=effectiveWerdDate(),restDay=!isScheduledOn(k,viewDate),viewingToday=sameWerdDate(viewDate,today),past=viewDate<normalizedWerdDate(today),future=viewDate>normalizedWerdDate(today),readDisabled=restDay||future||done>=a,{delta}=scheduleProgress(k),nextDate=nextScheduledDateFrom(k,viewDate);
+  const k=selected();reconcileKhatmaReadings(k);renderStateReleaseCore();const a=amount(k),done=reading(k,state.dayIndex),viewDate=activeViewedWerdDate(),today=effectiveWerdDate(),restDay=!isScheduledOn(k,viewDate),viewingToday=sameWerdDate(viewDate,today),past=viewDate<normalizedWerdDate(today),future=viewDate>normalizedWerdDate(today),readDisabled=restDay||future||done>=a||hasEarlierUnread(k,state.dayIndex),{delta}=scheduleProgress(k),nextDate=nextScheduledDateFrom(k,viewDate);
   $('khatmaStartCard').disabled=readDisabled;
   $('khatmaQuickCompleteBtn').disabled=readDisabled;$('khatmaQuickCompleteBtn').classList.toggle('completed',done>=a);
   $('khatmaQuickCompleteBtn').setAttribute('aria-label',done>=a?L('تمت قراءة وِرد اليوم','Today’s Werd Has Been Read'):L('تسجيل وِرد اليوم كمقروء','Mark Today’s Werd As Read'));
@@ -125,7 +134,7 @@ renderState=()=>{
   const regularStageLine=`${$('khatmaStageLine').textContent} · ${scheduleVerification(k,state.dayIndex)} · ${L('المعروض','Viewing')}: ${viewDate.toLocaleDateString(isEn()?'en-GB':'ar-EG-u-nu-latn',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}`;
   $('khatmaStageLine').textContent=restDay?(nextDate?L(`اليوم إجازة من القراءة\nالوِرد القادم: ${nextDate.toLocaleDateString('ar-EG-u-nu-latn',{weekday:'long'})}، ${localizedDate(nextDate)}`,`Today Is A Rest Day\nNext Werd: ${nextDate.toLocaleDateString('en-GB',{weekday:'long'})}, ${localizedDate(nextDate)}`):L('اليوم إجازة من القراءة\nاختر يوم قراءة واحدًا على الأقل من إعدادات الختمة.','Today Is A Rest Day\nChoose At Least One Reading Day In The Khatma Settings.')):regularStageLine;
   $('khatmaPositionToggleLabel').textContent=restDay?L('يوم إجازة من القراءة','Werd Rest Day'):L('المرحلة الحالية','Current Position');
-  $('khatmaPositionToggle').setAttribute('aria-expanded',String(khatmaPositionExpanded));$('khatmaStageLine').classList.toggle('hidden',!khatmaPositionExpanded);
+  $('khatmaPositionToggle').setAttribute('aria-expanded',String(khatmaPositionExpanded));$('khatmaStageLine').classList.add('hidden');
   $('khatmaRestNote').classList.add('hidden');$('khatmaRestNote').textContent='';
   document.querySelector('.khatma-summary').classList.toggle('rest-day',restDay);document.querySelector('.khatma-action-strip').classList.toggle('rest-day',restDay);
   $('homePreviousWirdBtn').disabled=viewDate<=normalizedWerdDate(`${k.startDate}T12:00:00`);
@@ -133,7 +142,7 @@ renderState=()=>{
   $('homePreviousWirdBtn').setAttribute('aria-label',L('اليوم السابق','Previous Day'));
   $('homeNextWirdBtn').setAttribute('aria-label',L('اليوم التالي','Next Day'));
 };
-completeCurrentWird=async()=>{const k=selected(),a=amount(k);setReading(k,state.dayIndex,a);reconcileKhatmaReadings(k);if(k.total>=240&&!k.completionDate)k.completionDate=dateKey();delete k.reopenDay;persist();return true};
+completeCurrentWird=async()=>{const k=selected(),a=amount(k);if(!await allowWerdReading(k,state.dayIndex))return false;setReading(k,state.dayIndex,a);reconcileKhatmaReadings(k);if(k.total>=240&&!k.completionDate)k.completionDate=dateKey();delete k.reopenDay;persist();return true};
 $('khatmaQuickCompleteBtn').onclick=async()=>{const k=selected(),viewDate=activeViewedWerdDate();if(!isScheduledOn(k,viewDate)||viewDate>normalizedWerdDate(effectiveWerdDate()))return;const approved=await appDialog({title:L('تأكيد قراءة الوِرد','Confirm Werd Reading'),message:L('هل أنت متأكد أنك تريد تسجيل هذا الوِرد كمقروء؟','Are You Sure You Want To Mark This Werd As Read?'),confirmText:L('نعم','Yes'),cancelText:L('لا','No'),showCancel:true});if(!approved||!await completeCurrentWird())return;renderState()};
 
 $('settingsHeaderBtn').onclick=()=>showScreen('settingsScreen');
@@ -157,7 +166,7 @@ $('continueOnboarding').onclick=()=>{state.quranLanguage=onboardingLanguage;cont
 
 const loadPrayerTimesReleaseCore=loadPrayerTimes;
 loadPrayerTimes=async(...args)=>{
-  await loadPrayerTimesReleaseCore(...args);const keys=['Fajr','Dhuhr','Asr','Maghrib','Isha'],times={};
+  await loadPrayerTimesReleaseCore(...args);const keys=['Fajr','Sunrise','Dhuhr','Asr','Maghrib','Isha'],times={};
   [...document.querySelectorAll('.prayer-row strong')].forEach((node,index)=>{
     const match=node.textContent.match(/(\d{1,2}):(\d{2})(?:\s*(AM|PM))?/i);if(!match||!keys[index])return;
     let hour=Number(match[1]);if(match[3]){if(match[3].toUpperCase()==='PM'&&hour<12)hour+=12;if(match[3].toUpperCase()==='AM'&&hour===12)hour=0}
@@ -165,8 +174,8 @@ loadPrayerTimes=async(...args)=>{
   });
   if(times.Fajr){state.prayer.times=times;state.prayer.fajr=times.Fajr;state.prayer.updatedAt=new Date().toISOString();persist();return}
   if(state.prayer.times?.Fajr){
-    const names={Fajr:L('الفجر','Fajr'),Dhuhr:L('الظهر','Dhuhr'),Asr:L('العصر','Asr'),Maghrib:L('المغرب','Maghrib'),Isha:L('العشاء','Isha')};
-    $('prayerTimes').innerHTML=Object.entries(names).map(([key,name])=>{const mode=state.prayer.alerts?.[key]||'off',alert=prayerAlertMarkup(mode);return`<article class="prayer-row"><span>${name}</span><button class="prayer-alert ${mode}" data-prayer="${key}" title="${alert.label}" aria-label="${name}: ${alert.label}">${alert.html}</button><strong>${formatTime(state.prayer.times[key])}</strong></article>`}).join('');
+    const names={Fajr:L('الفجر','Fajr'),Sunrise:L('وقت الشروق','Sunrise Time'),Dhuhr:L('الظهر','Dhuhr'),Asr:L('العصر','Asr'),Maghrib:L('المغرب','Maghrib'),Isha:L('العشاء','Isha')};
+    $('prayerTimes').innerHTML=Object.entries(names).map(([key,name])=>{if(key==='Sunrise')return`<article class="prayer-row sunrise-row"><span>${name}</span><span aria-hidden="true">☀</span><strong>${state.prayer.times[key]?formatTime(state.prayer.times[key]):'—'}</strong></article>`;const mode=state.prayer.alerts?.[key]||'off',alert=prayerAlertMarkup(mode);return`<article class="prayer-row"><span>${name}</span><button class="prayer-alert ${mode}" data-prayer="${key}" title="${alert.label}" aria-label="${name}: ${alert.label}">${alert.html}</button><strong>${formatTime(state.prayer.times[key])}</strong></article>`}).join('');
     document.querySelectorAll('.prayer-alert').forEach(b=>b.onclick=e=>{e.stopPropagation();cyclePrayerAlert(b.dataset.prayer,b)});
     const updated=state.prayer.updatedAt?localizedDate(new Date(state.prayer.updatedAt)):L('وقت سابق','An Earlier Time');
     $('prayerLocationStatus').textContent=L(`المواقيت المعروضة هي آخر مواقيت محفوظة، وآخر تحديث كان بتاريخ ${updated}.`,`Showing The Last Saved Prayer Times. Last Updated On ${updated}.`);
@@ -189,13 +198,15 @@ showScreen=id=>{
   if(id==='khatmaScreen')renderState();
   if(id==='mushafScreen'||id==='readingScreen')document.body.classList.remove('mushaf-controls-hidden');
 };
-function toggleReadingChrome(event){
-  if(pinchSuppressClick||!event.isPrimary||event.target.closest('button,input,select,a'))return;
-  document.body.classList.toggle('mushaf-controls-hidden');
-}
 for(const screen of [$('mushafScreen'),$('readingScreen')]){
-  screen.onclick=null;
-  screen.addEventListener('pointerup',toggleReadingChrome);
+  let tap=null;screen.onclick=null;
+  screen.addEventListener('pointerdown',event=>{tap=event.isPrimary?{x:event.clientX,y:event.clientY,time:performance.now(),scroll:readerPane()?.scrollTop}:null});
+  screen.addEventListener('pointercancel',()=>tap=null);
+  screen.addEventListener('pointerup',event=>{
+    if(!tap||pinchSuppressClick||!event.isPrimary||event.target.closest('button,input,select,a,[role="scrollbar"]'))return;
+    const valid=Math.hypot(event.clientX-tap.x,event.clientY-tap.y)<10&&performance.now()-tap.time<500&&Math.abs((readerPane()?.scrollTop||0)-(tap.scroll||0))<4;tap=null;
+    if(valid)setReadingChromeVisible(document.body.classList.contains('mushaf-controls-hidden'))
+  });
 }
 $('khatmaSelector').onchange=event=>{collapseKhatmaPosition();state.selectedId=Number(event.target.value);viewedWerdDate=null;state.dayIndex=displayedWerdIndex(selected());persist();renderState()};
 
@@ -215,6 +226,7 @@ function stripCarouselCloneIds(node){node.removeAttribute?.('id');node.querySele
 function currentCarouselCacheKey(){return`${selected().id}:${activeViewedWerdDate().getTime()}:${state.language}:${state.theme}:${selected().total}:${JSON.stringify(selected().readings||{})}`}
 function cloneRenderedSummary(){const clone=khatmaSummaryCard.cloneNode(true);stripCarouselCloneIds(clone);clone.classList.remove('werd-card-dragging','werd-card-settling');clone.classList.add('khatma-summary-peer');clone.setAttribute('aria-hidden','true');clone.querySelectorAll('button,select,input').forEach(control=>control.tabIndex=-1);return clone}
 function buildCarouselPeerCache(){
+  if(!$('khatmaScreen').classList.contains('active'))return;
   if(cardDragging){scheduleCarouselPeerCache();return}const key=currentCarouselCacheKey(),savedViewed=viewedWerdDate?new Date(viewedWerdDate):null,savedIndex=state.dayIndex,nextCache=new Map();carouselRenderingPeer=true;
   for(const delta of [-1,1]){viewedWerdDate=savedViewed;state.dayIndex=savedIndex;if(!canMoveViewedWerdDay(delta))continue;const target=activeViewedWerdDate();target.setDate(target.getDate()+delta);viewedWerdDate=target;syncViewedWerdIndex();renderState();nextCache.set(delta,cloneRenderedSummary())}
   viewedWerdDate=savedViewed;state.dayIndex=savedIndex;renderState();carouselRenderingPeer=false;carouselPeerCache=nextCache;carouselPeerCacheKey=key
@@ -248,5 +260,102 @@ for(const id of ['khatmaReminderTime','kahfNotificationTime','khatmaStartDateInp
   const pickerShell=shell||input?.closest('.date-field-shell');
   pickerShell?.addEventListener('click',()=>{if(input.readOnly||input.disabled)return;input.focus({preventScroll:true});try{input.showPicker?.()}catch{}});
 }
+
+// Reading order is shared by Home, Werd details, and completion actions.
+function pastScheduledWerdCount(k,today=normalizedWerdDate(new Date())){
+  const limit=Math.ceil(240/amount(k));let count=0;
+  while(count<limit&&normalizedWerdDate(scheduleDate(k,count))<today)count++;
+  return count;
+}
+function hasEarlierUnread(k,index){for(let i=0;i<index;i++)if(reading(k,i)<amount(k))return true;return false}
+async function allowWerdReading(k,index){
+  if(hasEarlierUnread(k,index)){
+    await appDialog({title:L('اقرأ الوِرد السابق أولًا','Read The Earlier Werd First'),message:L(`ابدأ بوِرد اليوم رقم ${firstUnreadIndex(k)+1} وأكمله قبل قراءة هذا الوِرد.`,`Complete Werd Day ${firstUnreadIndex(k)+1} Before Reading This Werd.`)});return false;
+  }
+  if(normalizedWerdDate(scheduleDate(k,index))>normalizedWerdDate(new Date())){
+    await appDialog({title:L('وِرد قادم','Upcoming Werd'),message:L('هذا الوِرد متاح للقراءة في موعده.','This Werd Will Be Available On Its Scheduled Date.')});return false;
+  }
+  return true;
+}
+const openWerdReadingOrderedCore=openWerdReading;
+openWerdReading=async()=>{if(await allowWerdReading(selected(),state.dayIndex))openWerdReadingOrderedCore()};
+$('startReadingBtn').onclick=()=>openWerdReading();
+
+let infoReturnFocus=null;
+function openKhatmaInfo(title,body){
+  infoReturnFocus=document.activeElement;$('khatmaInfoTitle').textContent=title;$('khatmaInfoBody').textContent=body;
+  $('khatmaInfoClose').setAttribute('aria-label',L('إغلاق','Close'));
+  $('khatmaInfoModal').classList.remove('hidden');$('khatmaInfoModal').querySelector('[role="dialog"]').focus();
+}
+function closeKhatmaInfo(){
+  $('khatmaInfoModal').classList.add('hidden');collapseKhatmaPosition();infoReturnFocus?.focus({preventScroll:true});
+}
+$('khatmaInfoClose').onclick=closeKhatmaInfo;
+$('khatmaInfoModal').onclick=event=>{if(event.target===$('khatmaInfoModal'))closeKhatmaInfo()};
+$('khatmaTodayText').onclick=()=>{
+  const range=rangeFor(selected(),state.dayIndex);
+  openKhatmaInfo(L('تفاصيل وِرد اليوم','Today’s Werd Details'),`${range.text}\n\n${verseText(range.startIndex)}`);
+};
+document.addEventListener('keydown',event=>{
+  if($('khatmaInfoModal').classList.contains('hidden'))return;
+  if(event.key==='Escape')closeKhatmaInfo();
+  if(event.key==='Tab'){event.preventDefault();$('khatmaInfoClose').focus()}
+});
+
+// Each reader has a single scroll pane. Its rail covers exactly that passage.
+function readerPane(){return document.body.classList.contains('reading-mode')?$('quranText'):document.body.classList.contains('mushaf-mode')?$('freeQuranText'):null}
+function setReadingChromeVisible(visible){
+  const pane=readerPane(),scrollTop=pane?.scrollTop||0;
+  const atEnd=pane&&pane.scrollHeight>pane.clientHeight&&Math.abs(pane.scrollHeight-pane.clientHeight-scrollTop)<2;
+  document.body.classList.toggle('mushaf-controls-hidden',!visible);
+  if(pane)pane.scrollTop=atEnd?pane.scrollHeight-pane.clientHeight:scrollTop;
+  updateReaderPosition();requestAnimationFrame(updateReaderPosition);
+}
+function updateReaderPosition(){
+  const pane=readerPane(),brand=$('themeBrandBtn');
+  if(!pane){brand.querySelector('.brand-ar').textContent='وِردي';brand.querySelector('.brand-en').textContent='Werdy';return}
+  const rail=pane.parentElement.querySelector('.reader-scrollbar'),max=Math.max(0,pane.scrollHeight-pane.clientHeight),ratio=max?Math.max(0,Math.min(1,pane.scrollTop/max)):0;
+  if(rail){
+    const height=rail.clientHeight,thumb=rail.firstElementChild,size=Math.min(height,Math.max(32,height*pane.clientHeight/Math.max(1,pane.scrollHeight)));
+    thumb.style.height=`${size}px`;thumb.style.transform=`translateY(${ratio*(height-size)}px)`;
+    rail.setAttribute('aria-valuenow',String(Math.round(ratio*100)));
+    rail.setAttribute('aria-valuetext',L(`${Math.round(ratio*100)}٪ من ${pane.id==='quranText'?'الوِرد':'المصحف'}`,`${Math.round(ratio*100)}% Of ${pane.id==='quranText'?'Werd':'Quran'}`));
+  }
+  const verses=pane.querySelectorAll('.ayah[data-surah]'),line=pane.getBoundingClientRect().top+pane.clientHeight/3;
+  let lo=0,hi=verses.length-1;
+  while(lo<hi){const mid=(lo+hi)>>1;if(verses[mid].getBoundingClientRect().bottom<line)lo=mid+1;else hi=mid}
+  const verse=verses[lo];if(!verse)return;
+  const number=Number(verse.dataset.surah);
+  brand.querySelector('.brand-ar').textContent=`سورة ${surahs[number-1][0]}`;
+  brand.querySelector('.brand-en').textContent=`Surah ${surahEnglishNames[number-1]}`;
+}
+for(const pane of [$('quranText'),$('freeQuranText')]){
+  const rail=document.createElement('div');rail.className='reader-scrollbar';rail.tabIndex=0;
+  rail.setAttribute('role','scrollbar');rail.setAttribute('aria-controls',pane.id);rail.setAttribute('aria-orientation','vertical');rail.setAttribute('aria-valuemin','0');rail.setAttribute('aria-valuemax','100');rail.setAttribute('aria-valuenow','0');rail.innerHTML='<span></span>';pane.parentElement.appendChild(rail);
+  let frame=0,dragging=false;
+  pane.addEventListener('scroll',()=>{if(frame)return;frame=requestAnimationFrame(()=>{frame=0;updateReaderPosition()})},{passive:true});
+  const seek=event=>{const rect=rail.getBoundingClientRect(),size=rail.firstElementChild.clientHeight,ratio=Math.max(0,Math.min(1,(event.clientY-rect.top-size/2)/Math.max(1,rect.height-size)));pane.scrollTop=ratio*(pane.scrollHeight-pane.clientHeight);updateReaderPosition()};
+  rail.addEventListener('pointerdown',event=>{event.preventDefault();event.stopPropagation();dragging=true;rail.setPointerCapture(event.pointerId);seek(event)});
+  rail.addEventListener('pointermove',event=>{if(dragging)seek(event)});
+  rail.addEventListener('pointerup',()=>dragging=false);rail.addEventListener('pointercancel',()=>dragging=false);
+  rail.addEventListener('keydown',event=>{const steps={ArrowDown:80,ArrowUp:-80,PageDown:pane.clientHeight,PageUp:-pane.clientHeight};if(event.key==='Home')pane.scrollTop=0;else if(event.key==='End')pane.scrollTop=pane.scrollHeight;else if(event.key in steps)pane.scrollTop+=steps[event.key];else return;event.preventDefault();updateReaderPosition()});
+  new ResizeObserver(()=>requestAnimationFrame(updateReaderPosition)).observe(pane);
+}
+window.addEventListener('werdy:reader-position',updateReaderPosition);
+const showScreenReaderCore=showScreen;
+showScreen=id=>{showScreenReaderCore(id);if(id==='readingScreen')$('quranText').scrollTop=0;updateReaderPosition();requestAnimationFrame(updateReaderPosition)};
+function displayedWeekday(date,english=false){
+  const arabic=['الْأَحَد','الاِثْنَيْن','الثُّلَاثَاء','الْأَرْبِعَاء','الْخَمِيس','الْجُمُعَة','السَّبْت'];
+  return english?date.toLocaleDateString('en-GB',{weekday:'long'}):arabic[date.getDay()];
+}
+const renderStateReaderCore=renderState;
+renderState=()=>{
+  renderStateReaderCore();
+  $('khatmaWeekday').textContent=displayedWeekday(activeViewedWerdDate(),isEn());
+  const k=selected(),blocked=hasEarlierUnread(k,state.dayIndex)||normalizedWerdDate(scheduleDate(k,state.dayIndex))>normalizedWerdDate(new Date());
+  for(const id of ['startReadingBtn','completeWirdDayBtn','finishQuarterBtn'])$(id).disabled=blocked||reading(k,state.dayIndex)>=amount(k);
+  if(hasEarlierUnread(k,state.dayIndex))$('khatmaStartCard').textContent=L(`اقرأ الوِرد رقم ${firstUnreadIndex(k)+1} أولًا`,`Read Werd ${firstUnreadIndex(k)+1} First`);
+  requestAnimationFrame(updateReaderPosition);
+};
 
 state.dayIndex=displayedWerdIndex(selected());renderState();loadPrayerTimes();
