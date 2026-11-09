@@ -1,0 +1,60 @@
+.desktop-workspace{display:none}
+@media(min-width:960px){
+  html:has(body.desktop-split),body.desktop-split{height:100%;overflow:hidden}
+  body.desktop-split{margin:0;padding:0;background:var(--bg)}
+  .desktop-split .desktop-workspace{display:grid;grid-template-columns:440px minmax(0,1fr);width:100%;height:100vh;height:100dvh;overflow:hidden;background:var(--bg)}
+  .desktop-controls{min-width:0;min-height:0;display:flex;flex-direction:column;background:var(--bg);border-inline-end:1px solid var(--border)}
+  .desktop-control-scroll{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--muted) transparent}
+  .desktop-split .desktop-control-scroll>.app-shell{width:100%;max-width:none;min-height:0;height:auto;overflow:visible;padding:0 10px 16px;margin:0}
+  .desktop-split .topbar{position:sticky!important;top:0!important;left:auto!important;right:auto!important;transform:none!important;width:100%!important;z-index:30}
+  .desktop-split #desktopControls>.bottom-nav{position:static!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;transform:none!important;width:calc(100% - 20px)!important;margin:8px 10px 10px!important;flex:none;opacity:1;pointer-events:auto}
+  .desktop-split .screen#readingScreen,.desktop-split .screen#mushafScreen{display:none!important}
+  .desktop-reader{display:flex;flex-direction:column;min-width:0;min-height:0;padding:20px 18px 14px;background:var(--surface)}
+  .desktop-reader-header{display:flex;align-items:center;justify-content:space-between;gap:20px;flex:none;padding-bottom:16px;border-bottom:1px solid var(--border)}
+  .desktop-reader-heading{min-width:0}
+  .desktop-reader-heading p{margin:0 0 5px;font-size:14px;color:var(--muted)}
+  .desktop-reader-heading h1{margin:0;font-size:26px;line-height:1.5;color:var(--text)}
+  .desktop-fullscreen{flex:none;min-height:42px;padding:8px 17px;border:1px solid var(--border);border-radius:13px;background:var(--surface-2);color:var(--text);font:inherit;font-size:15px;cursor:pointer}
+  .desktop-reader-context{flex:none;margin:12px 0;font-size:14px;line-height:1.7;color:var(--muted)}
+  .desktop-reading-stage{position:relative;flex:1;min-height:0;overflow:hidden;border:1px solid var(--border);border-radius:20px;background:var(--bg)}
+  .desktop-reading-scroll{height:100%;min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-width:none;scroll-behavior:auto;overflow-anchor:none;outline-offset:-3px}
+  .desktop-reading-scroll::-webkit-scrollbar{display:none}
+  .desktop-reading-rail{position:absolute;top:12px;bottom:12px;inset-inline-end:3px;width:20px;z-index:3;cursor:pointer;touch-action:none;direction:ltr;border-radius:12px}
+  .desktop-reading-rail::before{content:"";position:absolute;inset:0 5px;border-radius:10px;background:color-mix(in srgb,var(--muted) 17%,var(--bg));border:1px solid color-mix(in srgb,var(--border) 55%,transparent)}
+  .desktop-reading-rail>span{position:absolute;top:0;left:5px;width:10px;min-height:32px;border-radius:10px;background:var(--primary);box-shadow:0 1px 3px color-mix(in srgb,var(--text) 20%,transparent)}
+  .desktop-reading-rail:focus-visible{outline:2px solid var(--primary);outline-offset:0}
+  .desktop-reading-text{width:100%;max-width:none;margin:0;padding:20px 22px 38px;padding-inline-end:32px;font-size:var(--desktop-reading-size,28px);line-height:2.25;color:var(--text);-webkit-user-select:text;user-select:text}
+  .desktop-reading-text .passage-surah-title{margin:32px 0 24px;font-size:24px;line-height:1.8}
+  .desktop-reading-text .passage-surah-title:first-child{margin-top:0}
+  .desktop-reading-text .ayah{scroll-margin-top:140px}
+  .desktop-reader-footer{flex:none;display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px 18px;padding-top:12px;font-size:14px;color:var(--muted)}
+  .desktop-tool-group{display:flex;flex-direction:column;gap:5px;flex:none}
+  .desktop-tool-label{font-size:12px;line-height:1.4;color:var(--muted)}
+  .desktop-step-control{display:flex;align-items:center;gap:7px;direction:ltr}
+  .desktop-step-control button{width:36px;height:36px;min-width:36px;display:grid;place-items:center;padding:0;border:1px solid var(--border);border-radius:10px;background:var(--surface-2);color:var(--text);font-family:inherit;font-size:23px;line-height:1;cursor:pointer}
+  .desktop-step-control button:disabled{opacity:.35;cursor:default}
+  .desktop-step-control output{min-width:32px;text-align:center;font-size:14px;font-variant-numeric:tabular-nums;color:var(--text)}
+  .desktop-step-control input[type="range"]{width:110px;height:24px;margin:0;padding:0;border:0;accent-color:var(--primary);cursor:pointer;box-shadow:none}
+  .desktop-auto-controls{display:flex;align-items:center;gap:10px}
+  .desktop-auto-toggle{min-width:92px;height:36px;padding:0 10px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:10px;background:var(--surface-2);color:var(--text);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+  .desktop-auto-toggle[aria-pressed="true"]{background:var(--primary-strong);color:#fff;border-color:var(--primary-strong)}
+  .desktop-werd-actions{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-inline-start:auto}
+  .desktop-werd-actions[hidden],.desktop-next-surah[hidden]{display:none}
+  .desktop-werd-actions button{display:inline-flex;align-items:center;justify-content:center;gap:7px;white-space:nowrap}
+  .desktop-werd-actions svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+  .desktop-next-surah{margin-inline-start:auto;min-height:36px}
+  .desktop-reading-text .passage-bismillah{font-size:.82em}
+  .desktop-reader-footer .primary-btn{width:auto;margin:0;min-height:44px;padding:10px 16px;font-size:15px}
+  .desktop-reader-footer .small-btn{min-height:44px}
+  .desktop-reader-status{flex:none;margin:10px 0 0;font-size:14px;line-height:1.6;color:var(--muted)}
+  .desktop-reader-status:empty{display:none}
+  .desktop-split .modal-backdrop{z-index:200}
+  .desktop-split #globalQuranSearch{z-index:180}
+  .desktop-split button:focus-visible,.desktop-reading-scroll:focus-visible{outline:2px solid var(--primary);outline-offset:3px}
+}
+@media(min-width:960px) and (max-width:1199px){
+  .desktop-split .desktop-workspace{grid-template-columns:400px minmax(0,1fr)}
+  .desktop-reader{padding:20px 18px 14px}
+  .desktop-reading-text{padding:18px 18px 32px;padding-inline-end:30px}
+  .desktop-fullscreen{padding:8px 12px}
+}
