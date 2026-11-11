@@ -72,16 +72,21 @@
     const rail = $('desktopReadingRail'), thumb = $('desktopReadingThumb');
     text.style.setProperty('--desktop-reading-size',`${fontSizes[fontStep]}px`);
 
-    function isQuranSession(){return session&&session.mode!=='werd'}
+    function isQuranSession(){return session?.mode === 'mushaf' || session?.mode === 'surah'}
+    function adhkarTitle(){
+      return session?.category === 'evening' ? L('أذكار المساء','Evening Adhkar') : L('أذكار الصباح','Morning Adhkar');
+    }
     function scrollMaximum(){return Math.max(0,readerScroll.scrollHeight-readerScroll.clientHeight)}
     function updateRail(){
       const height=rail.clientHeight;if(!height)return;
-      const max=scrollMaximum(),ratio=max?Math.max(0,Math.min(1,readerScroll.scrollTop/max)):0;
+      const max=scrollMaximum();
+      if (autoRunning && readerScroll.scrollTop >= max - 1) stopAuto();
+      const ratio=max?Math.max(0,Math.min(1,readerScroll.scrollTop/max)):0;
       const size=Math.min(height,Math.max(32,height*readerScroll.clientHeight/Math.max(1,readerScroll.scrollHeight)));
       thumb.style.height=`${size}px`;thumb.style.transform=`translateY(${ratio*(height-size)}px)`;
       rail.setAttribute('aria-valuenow',String(Math.round(ratio*100)));
       rail.setAttribute('aria-label',L('موضع القراءة','Reading Position'));
-      const scope=session?.mode==='werd'?L('الوِرد','the Werd'):session?.mode==='surah'?L(`سورة ${surahs[session.surahNumber-1][0]}`,`Surah ${surahEnglishNames[session.surahNumber-1]}`):L('المصحف الكامل','the Complete Quran');
+      const scope=session?.mode==='adhkar'?adhkarTitle():session?.mode==='werd'?L('الوِرد','the Werd'):session?.mode==='surah'?L(`سورة ${surahs[session.surahNumber-1][0]}`,`Surah ${surahEnglishNames[session.surahNumber-1]}`):L('المصحف الكامل','the Complete Quran');
       rail.setAttribute('aria-valuetext',L(`${Math.round(ratio*100)}٪ من ${scope}`,`${Math.round(ratio*100)}% of ${scope}`));
     }
     function updateTools(){
@@ -117,18 +122,20 @@
       if(Math.abs(readerScroll.scrollTop-autoApplied)>2)autoTarget=readerScroll.scrollTop;
       const max=scrollMaximum();autoTarget=Math.min(max,autoTarget+scrollSpeeds[speedStep]*elapsed/1000);
       readerScroll.scrollTop=autoTarget;autoApplied=readerScroll.scrollTop;
-      if(readerScroll.scrollTop>=max-.5){readerScroll.scrollTop=max;stopAuto();updateRail();return}
+      if(readerScroll.scrollTop>=max-1){readerScroll.scrollTop=max;stopAuto();updateRail();return}
       autoFrame=requestAnimationFrame(autoTick);
     }
     function toggleAuto(){
       if(autoRunning){stopAuto();return}
-      if(!session||scrollMaximum()<=0||readerScroll.scrollTop>=scrollMaximum()-.5){$('desktopReaderStatus').textContent=L('وصلت إلى نهاية المحتوى المعروض.','You Have Reached the End of This Reading.');return}
+      if(!session||scrollMaximum()<=0||readerScroll.scrollTop>=scrollMaximum()-1){$('desktopReaderStatus').textContent=L('وصلت إلى نهاية المحتوى المعروض.','You Have Reached the End of This Reading.');return}
       autoRunning=true;autoTarget=readerScroll.scrollTop;autoApplied=autoTarget;autoLastTime=null;
       $('desktopReaderStatus').textContent='';updateTools();autoFrame=requestAnimationFrame(autoTick);
     }
     function setFontStep(value){
       const position=readerAnchor();
-      const anchor=position?text.querySelector(`[data-surah="${position.surah}"][data-ayah="${position.ayah}"]`):null;
+      const anchor=session?.mode === 'adhkar'
+        ? [...text.children].find(card => card.getBoundingClientRect().bottom > readerScroll.getBoundingClientRect().top)
+        : position?text.querySelector(`[data-surah="${position.surah}"][data-ayah="${position.ayah}"]`):null;
       const offset=anchor?anchor.getBoundingClientRect().top-readerScroll.getBoundingClientRect().top:null;
       fontStep=Math.max(0,Math.min(fontSizes.length-1,Math.round(Number(value)||0)));
       text.style.setProperty('--desktop-reading-size',`${fontSizes[fontStep]}px`);
@@ -179,7 +186,7 @@
       const full = Boolean(document.fullscreenElement);
       $('desktopFullscreen').textContent = full ? L('الخروج من ملء الشاشة', 'Exit Full Screen') : L('ملء الشاشة', 'Full Screen');
       $('desktopFullscreen').setAttribute('aria-pressed', String(full));
-      $('desktopReaderMode').textContent = session?.mode === 'werd' ? L('قراءة الوِرد', 'Werd Reading') : session?.mode==='surah'?L('قراءة سورة محددة','Selected Surah'):L('المصحف الكامل', 'Complete Quran');
+      $('desktopReaderMode').textContent = session?.mode === 'adhkar' ? L('الأذكار','Adhkar') : session?.mode === 'werd' ? L('قراءة الوِرد', 'Werd Reading') : session?.mode==='surah'?L('قراءة سورة محددة','Selected Surah'):L('المصحف الكامل', 'Complete Quran');
       $('desktopWerdActions').hidden = session?.mode !== 'werd';
       $('desktopShareWerdLabel').textContent = L('مشاركة الوِرد', 'Share Werd');
       $('desktopCompleteWerdLabel').textContent = L('تمت قراءة الوِرد كاملًا', 'Complete This Werd');
@@ -191,6 +198,9 @@
         $('desktopWerdProgress').textContent = k ? L(`${done} من ${amount(k)} ربع`, `${done} of ${amount(k)} quarters`) : L('تم تغيير إعدادات هذا الوِرد', 'This Werd Has Changed');
         $('desktopCompleteWerd').disabled = completing || !k || done >= amount(k) || hasEarlierUnread(k,session.dayIndex);
         $('desktopShareWerd').disabled = !k;
+      } else if (session?.mode === 'adhkar') {
+        $('desktopReaderTitle').textContent = adhkarTitle();
+        $('desktopReaderContext').textContent = state.language === 'en' ? $('adhkarTranslationNote').textContent : '';
       } else if(session?.mode==='surah'){
         $('desktopReaderContext').textContent=L('القراءة وشريط التمرير لهذه السورة فقط. واصل التمرير بعد نهايتها للانتقال إلى المصحف الكامل.','Reading and Scroll Position Cover Only This Surah. Continue Past Its End to Read the Full Quran.');
       } else {
@@ -202,6 +212,18 @@
       if (!session) return;
       stopAuto();
       workspace.dataset.readerMode=session.mode;
+      if (session.mode === 'adhkar') {
+        delete workspace.dataset.readerStart;
+        delete workspace.dataset.readerEnd;
+        text.lang = state.language;
+        text.dir = state.language === 'en' ? 'ltr' : 'rtl';
+        text.innerHTML = $('adhkarList').innerHTML;
+        session.language = state.language;
+        wordNodes = [];
+        readerScroll.scrollTop = 0;
+        updateLabels();
+        return;
+      }
       workspace.dataset.readerStart=String(session.startIndex);
       workspace.dataset.readerEnd=String(session.endIndex);
       text.dir = state.quranLanguage === 'en' ? 'ltr' : 'rtl';
@@ -211,7 +233,17 @@
       wordNodes = [...text.querySelectorAll('.ayah[data-surah]')];
       readerScroll.scrollTop = 0;
       updateLabels();
-      if (position) requestAnimationFrame(() => goToVerse(position));
+      if (position) {
+        const current = session;
+        requestAnimationFrame(() => { if (session === current) goToVerse(position); });
+      }
+    }
+    function openAdhkar() {
+      if (isQuranSession()) lastMushafPosition = readerAnchor();
+      if (session?.mode === 'adhkar' && session.category === activeAdhkar && session.language === state.language) return;
+      session = {mode:'adhkar', category:activeAdhkar};
+      renderSession();
+      $('desktopReaderStatus').textContent = '';
     }
     function openMushaf(position=null,selectedSurah=false){
       if(!position&&!isQuranSession())position=lastMushafPosition||savedMushafPosition();
@@ -259,6 +291,7 @@
       controlScreen = id;
       showScreenCore(id);
       controlScroll.scrollTop = 0;
+      if (id === 'adhkarScreen') openAdhkar();
       updateLabels();
     };
     const mushafPositionCore = showMushafPosition;
@@ -269,11 +302,21 @@
     const mushafNav = document.querySelector('.nav-item[data-target="mushafScreen"]');
     const mushafNavCore = mushafNav.onclick;
     mushafNav.onclick = event => wide.matches ? openMushaf() : mushafNavCore.call(mushafNav,event);
+    document.querySelectorAll('.adhkar-tab').forEach(tab => {
+      const tabCore = tab.onclick;
+      tab.onclick = event => {
+        if (!wide.matches) return tabCore.call(tab,event);
+        activeAdhkar = tab.dataset.adhkar;
+        renderAdhkar();
+        openAdhkar();
+      };
+    });
     const languageCore = applyLanguage;
     applyLanguage = () => {
       languageCore();
       if (!wide.matches) return;
-      if (session && session.language !== state.quranLanguage) renderSession(readerAnchor());
+      if (session?.mode === 'adhkar') openAdhkar();
+      else if (session && session.language !== state.quranLanguage) renderSession(readerAnchor());
       updateLabels();
     };
     const renderCore = renderState;
@@ -366,6 +409,7 @@
         document.body.classList.remove('reading-mode','mushaf-mode','mushaf-controls-hidden');
         showScreenCore(transfer?'khatmaScreen':controlScreen);
         if(active==='readingScreen')openWerd(werdKhatma,werdIndex);
+        else if (active === 'adhkarScreen') openAdhkar();
         else if(active==='mushafScreen'||!session)openMushaf(savedMushafPosition());
         if(narrowPosition)requestAnimationFrame(()=>goToVerse({surah:Number(narrowPosition.dataset.surah),ayah:Number(narrowPosition.dataset.ayah)}));
         updateLabels();

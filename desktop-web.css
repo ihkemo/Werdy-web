@@ -24,6 +24,17 @@
   .desktop-reading-rail>span{position:absolute;top:0;left:5px;width:10px;min-height:32px;border-radius:10px;background:var(--primary);box-shadow:0 1px 3px color-mix(in srgb,var(--text) 20%,transparent)}
   .desktop-reading-rail:focus-visible{outline:2px solid var(--primary);outline-offset:0}
   .desktop-reading-text{width:100%;max-width:none;margin:0;padding:20px 22px 38px;padding-inline-end:32px;font-size:var(--desktop-reading-size,28px);line-height:2.25;color:var(--text);-webkit-user-select:text;user-select:text}
+  .desktop-split #adhkarList,
+  .desktop-split #adhkarTranslationNote,
+  [data-reader-mode="adhkar"] .desktop-reader-context:empty{display:none}
+  [data-reader-mode="adhkar"] .desktop-reading-text{display:grid;gap:18px;text-align:center}
+  [data-reader-mode="adhkar"] .adhkar-card{padding:clamp(18px,3vw,42px)}
+  [data-reader-mode="adhkar"] .adhkar-card h2{font-size:.82em}
+  [data-reader-mode="adhkar"] .adhkar-bismillah,
+  [data-reader-mode="adhkar"] .adhkar-repeat{font-size:.8em}
+  [data-reader-mode="adhkar"] .adhkar-quran-text,
+  [data-reader-mode="adhkar"] .dua-adhkar-card p{font-size:inherit;text-align:center}
+  [data-reader-mode="adhkar"] .adhkar-section-label{font-size:.72em}
   .desktop-reading-text .passage-surah-title{margin:32px 0 24px;font-size:24px;line-height:1.8}
   .desktop-reading-text .passage-surah-title:first-child{margin-top:0}
   .desktop-reading-text .ayah{scroll-margin-top:140px}

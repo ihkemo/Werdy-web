@@ -24,6 +24,7 @@ function element(id=''){
   Object.defineProperty(n,'innerHTML',{get:()=>html,set:value=>{
     html=value;
     if(id==='desktopReadingText'){
+      if (value.startsWith('<')) { n.words=[]; return; }
       const meta=JSON.parse(value);
       n.words=verses.slice(meta.start,meta.end+1).map((v,i)=>({dataset:{surah:String(v.surah),ayah:String(v.ayah)},previousElementSibling:null,getBoundingClientRect:()=>({top:124+i*40-nodes.get('desktopReadingScroll').scrollTop,bottom:160+i*40-nodes.get('desktopReadingScroll').scrollTop})}));
     }else for(const [,name]of value.matchAll(/id="([^"]+)"/g))node(name);
@@ -33,16 +34,21 @@ function element(id=''){
 function node(id){if(!nodes.has(id))nodes.set(id,element(id));return nodes.get(id)}
 const body=element('body'),shell=node('appShell'),nav=node('nav'),mushafNav=node('mushafNav');body.appendChild(shell);shell.appendChild(nav);
 node('quranText').words=[];node('freeQuranText').words=[];
+const eveningTab=node('eveningAdhkarTab');
+eveningTab.dataset.adhkar='evening';
+eveningTab.onclick=()=>{};
 const wide={matches:true,addEventListener:(type,callback)=>{wide.changed=callback}};
 const state={language:'ar',quranLanguage:'ar',fontSize:26,selectedId:1,dayIndex:0,lastMushaf:{surah:'الفاتحة',ayah:1},khatmas:[{id:1,name:'First',parts:0,quarters:2,readings:{},total:0},{id:2,name:'Second',parts:0,quarters:4,readings:{},total:0}]};
 const amount=k=>k.parts*8+k.quarters;
 const rangeFor=(k,day)=>{const start=data.quarters[Math.min(239,day*amount(k))],end=data.quarters[Math.min(239,day*amount(k)+amount(k)-1)];return{startIndex:start.startIndex,endIndex:end.endIndex}};
-const document={body,readyState:'complete',fullscreenElement:null,createElement:()=>element(),createComment:()=>element(),addEventListener:(type,callback)=>events.set(type,callback),querySelector:s=>s==='.app-shell'?shell:s==='.bottom-nav'?nav:s==='.screen.active'?node(active):mushafNav};
+const document={body,readyState:'complete',fullscreenElement:null,createElement:()=>element(),createComment:()=>element(),addEventListener:(type,callback)=>events.set(type,callback),querySelectorAll:s=>s==='.adhkar-tab'?[eveningTab]:[],querySelector:s=>s==='.app-shell'?shell:s==='.bottom-nav'?nav:s==='.screen.active'?node(active):mushafNav};
 document.documentElement={dir:'rtl',requestFullscreen:async()=>{document.fullscreenElement=document.documentElement;events.get('fullscreenchange')?.()}};
 document.exitFullscreen=async()=>{document.fullscreenElement=null;events.get('fullscreenchange')?.()};
 document.getSelection=()=>({isCollapsed:true});
 const context=vm.createContext({document,matchMedia:()=>wide,localStorage:{getItem:key=>storage.get(key)??null,setItem:(key,value)=>storage.set(key,value)},quranData:data,requestAnimationFrame:callback=>{frames.set(++frameId,callback);return frameId},cancelAnimationFrame:id=>frames.delete(id),$:node,state,quranVerses:verses,surahs:data.surahs.map(s=>[s.name||String(s.number)]),surahEnglishNames:data.surahs.map(s=>s.transliteratedName),L:(ar,en)=>state.language==='en'?en:ar,selected:()=>state.khatmas.find(k=>k.id===state.selectedId),amount,rangeFor,reading:(k,i)=>k.readings[i]||0,scheduleDate:(k,i)=>new Date(2026,10,1+i),dateKey:d=>d.toISOString().slice(0,10),hasEarlierUnread:()=>false,allowWerdReading:async()=>true,setReading:(k,i,v)=>{k.readings[i]=v},reconcileKhatmaReadings:k=>{k.total=Object.values(k.readings).reduce((a,b)=>a+b,0)},persist(){},shareWird(){},showScreen:id=>{active=id;if(id==='khatmaScreen')state.dayIndex=0},showMushafPosition(){},applyLanguage:()=>{document.documentElement.dir=state.language==='en'?'ltr':'rtl'},renderState(){},renderQuranPassage:(start,end,prefix)=>JSON.stringify({start,end,prefix,language:state.quranLanguage})});
 mushafNav.onclick=()=>context.showScreen('mushafScreen');
+context.activeAdhkar='morning';
+context.renderAdhkar=()=>{node('adhkarList').innerHTML=`<article>${context.activeAdhkar}</article>`};
 vm.runInContext(source,context);
 const workspace=body.children.find(n=>n.className==='desktop-workspace');
 assert.equal(shell.parentElement,node('desktopControlScroll'));
@@ -130,3 +136,21 @@ node('desktopNextSurah').onclick();
 assert.equal(workspace.dataset.readerMode,'mushaf');
 assert.equal(workspace.dataset.readerEnd,'6235');
 console.log('✓ Seven desktop-only font steps, five speed limits, smooth fractional motion, click pause/resume, manual scrolling while running, end stop, permanent rail, selected-Surah scope and anchored expansion');
+
+context.renderAdhkar();
+context.showScreen('adhkarScreen');
+assert.equal(workspace.dataset.readerMode,'adhkar');
+assert.equal(workspace.dataset.readerStart,undefined);
+assert.equal(node('desktopReaderTitle').textContent,'Morning Adhkar');
+assert.equal(node('desktopReadingText').innerHTML,'<article>morning</article>');
+eveningTab.onclick();
+assert.equal(node('desktopReaderTitle').textContent,'Evening Adhkar');
+assert.equal(node('desktopReadingText').innerHTML,'<article>evening</article>');
+assert.match(node('desktopReadingRail')['aria-valuetext'],/Evening Adhkar/);
+state.language='ar';
+context.applyLanguage();
+assert.equal(node('desktopReadingText').lang,'ar');
+assert.equal(node('desktopReaderTitle').textContent,'أذكار المساء');
+mushafNav.onclick();
+assert.equal(workspace.dataset.readerMode,'mushaf');
+console.log('✓ Desktop Adhkar selection, language, scrollbar scope, and return to Quran');
